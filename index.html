@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOR ANALYZER PRO - AI Procurement Compliance Auditor</title>
+    <title>TOR ANALYZER PRO - AI Procurement Compliance Auditor Dashboard</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Anuphan for elegant Thai typography -->
@@ -15,8 +15,23 @@
             font-family: 'Anuphan', sans-serif;
             background-color: #f8fafc;
         }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
         @media print {
-            nav, .no-print, button, footer {
+            nav, .no-print, button, footer, .tab-menu-container {
                 display: none !important;
             }
             .print-full {
@@ -26,20 +41,24 @@
                 margin: 0 !important;
             }
             .card-flat {
-                border: 1px solid #e2e8f0 !important;
+                border: 1px solid #cbd5e1 !important;
                 box-shadow: none !important;
-                border-radius: 4px !important;
+                border-radius: 8px !important;
+                background-color: white !important;
             }
             body {
                 background: white !important;
                 color: black !important;
             }
+            .print-break-inside {
+                page-break-inside: avoid;
+            }
         }
         .animate-fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
+            animation: fadeIn 0.25s ease-out forwards;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+            from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -48,37 +67,57 @@
 
     <!-- Navigation Header -->
     <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3 shadow-sm no-print">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
             <!-- Brand Logo -->
             <div class="flex items-center gap-3">
                 <div class="bg-indigo-600 p-2.5 rounded-2xl shadow-lg shadow-indigo-100 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">TOR ANALYZER <span class="text-indigo-600">PRO</span></h1>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">TOR ANALYZER <span class="text-indigo-600">PRO</span></h1>
+                        <span class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-md">Enterprise v2.2</span>
+                    </div>
                     <div class="flex items-center gap-1.5">
                         <span class="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">AI-Powered Compliance Checker</p>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">AI Procurement Auditor Dashboard</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab Switching Menu -->
-            <div class="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200 shadow-inner">
-                <button id="tab-btn-input" onclick="switchTab('input')" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-indigo-600 shadow-sm">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                    กรอกข้อมูลนำเข้า
-                </button>
-                <button id="tab-btn-specs" onclick="switchTab('specs')" disabled class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-300 cursor-not-allowed">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
-                    ข้อกำหนดที่วิเคราะห์ได้ (<span id="spec-count-badge">0</span>)
-                </button>
-                <button id="tab-btn-comparison" onclick="switchTab('comparison')" disabled class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-300 cursor-not-allowed">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                    ตารางเปรียบเทียบมาตรฐาน
-                </button>
+            <!-- Tab Switching Menu & Global Export/Import -->
+            <div class="flex flex-wrap items-center gap-3 tab-menu-container">
+                <div class="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200 shadow-inner">
+                    <button id="tab-btn-input" onclick="switchTab('input')" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-indigo-600 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                        กรอกข้อมูลนำเข้า
+                    </button>
+                    <button id="tab-btn-specs" onclick="switchTab('specs')" disabled class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-300 cursor-not-allowed">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+                        ข้อกำหนดสเปก (<span id="spec-count-badge">0</span>)
+                    </button>
+                    <button id="tab-btn-comparison" onclick="switchTab('comparison')" disabled class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-300 cursor-not-allowed">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                        ตารางวิเคราะห์ความถูกต้อง
+                    </button>
+                </div>
+
+                <!-- Action Utilities -->
+                <div class="flex items-center gap-2">
+                    <button onclick="triggerExport()" id="btn-export" disabled class="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition-all opacity-40 cursor-not-allowed" title="ส่งออกเซสชัน (Export)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                    </button>
+                    <label class="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition-all cursor-pointer" title="นำเข้าเซสชัน (Import)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        <input type="file" id="import-file-input" class="hidden" accept=".json" onchange="triggerImport(event)">
+                    </label>
+                </div>
             </div>
         </div>
     </nav>
@@ -94,30 +133,35 @@
                 <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
                     <div class="p-5 bg-slate-50 border-b border-slate-100 flex justify-between items-center flex-wrap gap-2">
                         <h3 class="font-bold text-slate-700 flex items-center gap-2 text-sm">
-                            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                            เนื้อหาเอกสาร TOR (Terms of Reference)
+                            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                            เนื้อหาเอกสาร TOR (Terms of Reference) ที่ต้องการสกัดเกณฑ์
                         </h3>
                         <!-- Quick Templates Dropdown -->
                         <div class="flex items-center gap-2">
-                            <span class="text-xs text-slate-500 font-medium">โหลดตัวอย่าง:</span>
+                            <span class="text-xs text-slate-500 font-semibold">เทมเพลตมาตรฐาน:</span>
                             <select id="template-selector" onchange="loadTemplate(this.value)" class="text-xs bg-white border border-slate-200 rounded-lg py-1 px-2.5 font-bold text-indigo-600 outline-none focus:ring-1 focus:ring-indigo-500">
-                                <option value="">-- กรุณาเลือก --</option>
-                                <option value="notebook-office">💻 คอมพิวเตอร์พกพา (งานสำนักงาน)</option>
-                                <option value="notebook-graphics">🎨 คอมพิวเตอร์ประสิทธิภาพสูง (งานกราฟิก)</option>
-                                <option value="server-storage">🖥️ เครื่องคอมพิวเตอร์แม่ข่าย (Server)</option>
+                                <option value="">-- เลือกรูปแบบตัวอย่าง --</option>
+                                <option value="notebook-office">💻 คอมพิวเตอร์พกพา (งานสำนักงานทั่วไป)</option>
+                                <option value="notebook-graphics">🎨 คอมพิวเตอร์สเปกสูง (กราฟิก/ประมวลผลสูง)</option>
+                                <option value="server-storage">🖥️ คอมพิวเตอร์แม่ข่าย (Server 2U Redundant)</option>
                             </select>
                         </div>
                     </div>
-                    <textarea id="tor-text" rows="12" placeholder="กรุณาวางข้อความสเปกจากเอกสาร TOR ของคุณที่นี่ หรือคลิกปุ่มโหลดตัวอย่างสเปกเครื่องคอมพิวเตอร์ด้านบนเพื่อเริ่มต้น..." class="w-full p-6 text-slate-700 text-base border-none focus:ring-0 resize-none leading-relaxed placeholder:text-slate-300"></textarea>
+                    <textarea id="tor-text" rows="12" placeholder="วางข้อความรายละเอียดสเปก ข้อกำหนด ขอบเขต หรือสัญญาราชการ/เอกชนที่นี่..." class="w-full p-6 text-slate-700 text-base border-none focus:ring-0 resize-none leading-relaxed placeholder:text-slate-300"></textarea>
                 </div>
 
                 <!-- Keywords/Brands -->
                 <div class="bg-indigo-50/55 rounded-[2rem] p-6 border border-indigo-100/70">
-                    <h3 class="font-bold text-indigo-950 mb-3 flex items-center gap-2 text-sm">
-                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                        ยี่ห้อ หรือ รุ่นที่ต้องการเปรียบเทียบในท้องตลาดปัจจุบัน (ระบุได้มากกว่า 1)
-                    </h3>
-                    <input id="target-brands" type="text" placeholder="ตัวอย่างเช่น: MacBook Air M3, Dell Latitude 5440, HP ProBook 440 G10 (หากปล่อยว่าง ระบบจะหาเทียบรุ่นมาตรฐานให้)" class="w-full p-4 rounded-2xl border border-white bg-white/90 shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700 font-medium placeholder:text-slate-300 transition-all" />
+                    <div class="flex items-start gap-3 mb-3">
+                        <div class="bg-indigo-100 p-2 rounded-xl mt-0.5 text-indigo-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-extrabold text-indigo-950 text-sm">ยี่ห้อ หรือ รุ่นคู่เทียบจริงในท้องตลาดไทย (ตลาดปี 2024 - 2026)</h3>
+                            <p class="text-xs text-indigo-700/80 mt-0.5">ระบุรุ่นผลิตภัณฑ์เพื่อให้ AI สืบคืนราคากลางและการจำหน่ายจริงในไทย เช่น: Dell Latitude 3440, ThinkPad E14 Gen 5</p>
+                        </div>
+                    </div>
+                    <input id="target-brands" type="text" placeholder="ระบุรุ่น เช่น: Dell Latitude 5440, HP ProBook 440 G10, MacBook Air M3 (ปล่อยว่างเพื่อให้ AI ค้นหารุ่นมาตรฐานในตลาดให้)" class="w-full p-4 rounded-2xl border border-white bg-white/90 shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700 font-medium placeholder:text-slate-300 transition-all" />
                 </div>
             </div>
 
@@ -125,7 +169,7 @@
             <div class="lg:col-span-4 space-y-6">
                 <!-- Notifications/Error Display -->
                 <div id="error-alert" class="hidden bg-rose-50 border border-rose-100 p-4 rounded-2xl flex gap-3 text-rose-600">
-                    <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                     <div>
                         <h4 class="font-bold text-xs uppercase tracking-wider">พบข้อผิดพลาด</h4>
                         <p id="error-message" class="text-xs mt-0.5 font-medium"></p>
@@ -134,32 +178,32 @@
 
                 <!-- Process Button -->
                 <button id="btn-start-analysis" onclick="handleProcess()" class="w-full py-6 rounded-[2.5rem] font-extrabold text-xl flex flex-col items-center justify-center gap-2 transition-all transform hover:scale-[1.01] active:scale-[0.99] bg-indigo-600 text-white shadow-xl shadow-indigo-100 hover:bg-indigo-700">
-                    <svg id="start-btn-icon-normal" class="w-10 h-10 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    <svg id="start-btn-icon-loading" class="hidden w-10 h-10 mb-1 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 4.19M20 3v5h-5" /></svg>
-                    <span id="start-btn-text" class="text-lg">เริ่มวิเคราะห์ข้อมูลด้วย AI</span>
-                    <span class="text-[10px] opacity-75 font-bold uppercase tracking-widest">Powered by Gemini 2.5 Flash</span>
+                    <svg id="start-btn-icon-normal" class="w-10 h-10 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    <svg id="start-btn-icon-loading" class="hidden w-10 h-10 mb-1 animate-spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 4.19M20 3v5h-5" /></svg>
+                    <span id="start-btn-text" class="text-lg">เริ่มตรวจสอบสเปกด้วย AI</span>
+                    <span class="text-[10px] opacity-75 font-bold uppercase tracking-widest">Powered by Gemini 2.5 & Google Search</span>
                 </button>
 
                 <!-- Technical Details Card -->
                 <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm space-y-4">
                     <h4 class="font-extrabold text-slate-800 uppercase text-[10px] tracking-wider flex items-center gap-2">
-                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                         สถาปัตยกรรมและเทคโนโลยีที่ใช้
                     </h4>
                     <div class="space-y-2.5">
                         <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
                             <div class="flex items-center gap-2.5">
                                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                <span class="text-xs font-bold text-slate-600">Gemini 2.5 Flash-Preview</span>
+                                <span class="text-xs font-bold text-slate-600">Gemini Generative Engine</span>
                             </div>
-                            <span class="text-[9px] text-slate-400 font-bold uppercase">09-2025</span>
+                            <span class="text-[9px] text-slate-400 font-bold uppercase">Dynamic</span>
                         </div>
                         <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
                             <div class="flex items-center gap-2.5">
                                 <span class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span>
                                 <span class="text-xs font-bold text-slate-600">Google Grounding Search</span>
                             </div>
-                            <span class="text-[9px] text-indigo-500 font-extrabold uppercase">Live Check</span>
+                            <span class="text-[9px] text-indigo-500 font-extrabold uppercase">Live Checked</span>
                         </div>
                     </div>
 
@@ -171,7 +215,7 @@
                             <span class="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
                         </div>
                         <p id="progress-text" class="text-xs text-indigo-800 font-semibold text-center leading-relaxed">
-                            กำลังเตรียมเซสชันวิเคราะห์...
+                            กำลังเตรียมโครงสร้างการวิเคราะห์...
                         </p>
                     </div>
                 </div>
@@ -180,79 +224,184 @@
 
         <!-- Tab 2: Specifications List & Editing -->
         <div id="tab-view-specs" class="hidden animate-fade-in space-y-6">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-5">
                 <div>
-                    <h2 class="text-2xl font-black text-slate-800 tracking-tight">หัวข้อและคุณสมบัติทางเทคนิคที่ตรวจพบ</h2>
-                    <p class="text-slate-500 text-sm font-medium">คุณสามารถปรับแต่งหรือลบเกณฑ์ที่ไม่จำเป็นออกได้เพื่อกำหนดสโคปให้ชัดเจนก่อนทำการตรวจสอบสินค้าจริง</p>
+                    <h2 class="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                        <span>ข้อกำหนดทางเทคนิคที่ AI สกัดแยกข้อได้</span>
+                    </h2>
+                    <p class="text-slate-500 text-sm font-medium">คุณสามารถเพิ่ม ลบ หรือแก้ไขถ้อยคำความต้องการเหล่านี้ได้ ระบบจะนำข้อมูลนี้ไปเปรียบเทียบในขั้นตอนถัดไป</p>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="addNewSpecification()" class="flex items-center gap-1.5 px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                        เพิ่มหัวข้อสเปก
+                <div class="flex flex-wrap gap-2.5 w-full md:w-auto">
+                    <button onclick="addNewSpecification()" class="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition-all w-full md:w-auto">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        เพิ่มเกณฑ์ใหม่
                     </button>
-                    <button onclick="switchTab('comparison')" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-100">
-                        ดูผลตารางเปรียบเทียบ
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    <button onclick="switchTab('comparison')" class="flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-100 w-full md:w-auto">
+                        <span>วิเคราะห์ความสอดคล้องต่อ</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
                     </button>
+                </div>
+            </div>
+
+            <!-- Search, Category Filter & Dashboard Stats Panel -->
+            <div class="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </span>
+                    <input type="text" id="search-spec-input" oninput="filterSpecifications()" placeholder="ค้นหาตามข้อกำหนด/คำหลัก..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-semibold text-slate-400 whitespace-nowrap">ความสำคัญ:</span>
+                    <select id="filter-importance" onchange="filterSpecifications()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 focus:ring-2 focus:ring-indigo-500/20 outline-none">
+                        <option value="ALL">ทั้งหมด</option>
+                        <option value="High">ความสำคัญสูง (High)</option>
+                        <option value="Medium">ความสำคัญปานกลาง (Medium)</option>
+                        <option value="Low">ความสำคัญทั่วไป (Low)</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-3 text-right">
+                    <div class="bg-indigo-50 border border-indigo-100/50 px-4 py-2 rounded-xl">
+                        <div class="text-[10px] font-bold text-indigo-400 uppercase">สเปกรวม</div>
+                        <div class="text-lg font-black text-indigo-700" id="stat-total-specs">0</div>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-100/50 px-4 py-2 rounded-xl">
+                        <div class="text-[10px] font-bold text-amber-500 uppercase">สเปกสำคัญสูง</div>
+                        <div class="text-lg font-black text-amber-700" id="stat-high-specs">0</div>
+                    </div>
                 </div>
             </div>
 
             <!-- Specs Grid -->
             <div id="specs-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                <!-- Will be dynamically populated via Javascript -->
+                <!-- Will be dynamically populated -->
             </div>
         </div>
 
         <!-- Tab 3: Evaluation & Comparison Matrix -->
-        <div id="tab-view-comparison" class="hidden animate-fade-in space-y-8">
+        <div id="tab-view-comparison" class="hidden animate-fade-in space-y-6 print-full">
+            
+            <!-- Executive Summary & Metrics Dashboard -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print">
+                <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">ภาพรวมผลการตรวจสอบ</span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 animate-pulse"></span>
+                        </div>
+                        <h3 class="text-2xl font-black text-slate-800" id="dashboard-total-products">0 รายการ</h3>
+                        <p class="text-xs text-slate-500 mt-1">ผู้ผลิตหรือผลิตภัณฑ์จริงในท้องตลาดไทยที่สืบค้นข้อมูลเชิงลึกผ่านการ Grounding ค้นหาข้อมูลจริง</p>
+                    </div>
+                    <div class="border-t border-slate-100 mt-4 pt-3 text-[11px] font-semibold text-indigo-600 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        คลิกที่สถานะเพื่อบังคับผ่าน/ไม่ผ่านด้วยตัวคุณเองได้ทันที
+                    </div>
+                </div>
+
+                <!-- Dynamically generated mini candidate summary graphs will go here -->
+                <div class="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                    <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-3 block">คะแนนความสอดคล้องกับ TOR (%)</span>
+                    <div id="candidate-metrics-bars" class="space-y-4">
+                        <!-- Dynamic bar graphs -->
+                    </div>
+                </div>
+            </div>
+
             <!-- Header actions for results -->
             <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden print-full card-flat">
                 <div class="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 no-print">
                     <div>
-                        <h2 class="text-2xl font-black text-slate-800 tracking-tight">Technical Comparison Matrix</h2>
-                        <p class="text-slate-500 text-sm font-medium">การจับคู่และตรวจเช็กเกณฑ์คุณสมบัติตามมาตรฐานการจัดซื้อจัดจ้าง</p>
+                        <h2 class="text-xl font-black text-slate-800 tracking-tight">Technical Compliance Matrix</h2>
+                        <p class="text-slate-500 text-xs font-medium mt-1">ตารางแสดงสเปกทีละเกณฑ์เทียบกับสินค้าจริง (แก้ไขบันทึกได้ทุกตำแหน่ง)</p>
                     </div>
-                    <div class="flex flex-wrap gap-2.5">
-                        <button onclick="switchTab('input')" class="flex items-center gap-2 px-5 py-3 bg-white border border-slate-200 hover:bg-slate-50 rounded-2xl text-xs font-bold text-slate-600 shadow-sm transition-all">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 4.19M20 3v5h-5" /></svg>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="switchTab('input')" class="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-600 shadow-sm transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
                             กรอกสเปกใหม่
                         </button>
-                        <button onclick="window.print()" class="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs font-extrabold shadow-lg shadow-indigo-100 transition-all">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                            พิมพ์เอกสาร / บันทึก PDF
+                        <button onclick="window.print()" class="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-extrabold shadow-md shadow-indigo-100 transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                            พิมพ์รายงานตรวจสเปก / บันทึก PDF
                         </button>
                     </div>
                 </div>
 
-                <!-- Printable Header only shown in print -->
-                <div class="hidden print:block p-8 border-b border-slate-200">
-                    <h1 class="text-2xl font-black text-slate-900 mb-1">รายงานการตรวจสอบเกณฑ์คุณสมบัติทางเทคนิค (TOR)</h1>
-                    <p class="text-slate-500 text-sm font-semibold">สร้างโดยระบบวิเคราะห์จัดซื้ออัตโนมัติ TOR Analyzer PRO</p>
+                <!-- Printable Header only shown in print layout -->
+                <div class="hidden print:block p-8 border-b-2 border-slate-300">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h1 class="text-2xl font-black text-slate-900 mb-1">รายงานผลการตรวจเช็กและวิเคราะห์เกณฑ์คุณสมบัติทางเทคนิค (TOR)</h1>
+                            <p class="text-slate-500 text-xs font-bold">สร้างรายงานอัตโนมัติด้วยแพลตฟอร์ม TOR Analyzer PRO • ข้อมูลเชื่อมโยงสืบค้นตลาดจริง</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-slate-400 font-bold uppercase">วันที่รายงาน</div>
+                            <div class="text-sm font-bold text-slate-800" id="print-date">11 มิถุนายน 2026</div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mt-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-400">เนื้อหา TOR อ้างอิง:</span>
+                            <p class="text-xs text-slate-600 line-clamp-3 mt-1" id="print-tor-ref"></p>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-400">กลุ่มผลิตภัณฑ์เป้าหมายสืบค้น:</span>
+                            <p class="text-xs text-slate-600 mt-1" id="print-brands-ref"></p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Interactive Matrix Table -->
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse table-fixed min-w-[900px]">
+                    <table class="w-full text-left border-collapse table-fixed min-w-[950px]">
                         <thead>
-                            <tr class="bg-white border-b border-slate-100" id="matrix-header-row">
-                                <!-- Dynamically populated -->
+                            <tr class="bg-slate-50 border-b border-slate-200" id="matrix-header-row">
+                                <!-- Dynamically populated headers -->
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100" id="matrix-body">
-                            <!-- Dynamically populated -->
+                            <!-- Dynamically populated body rows -->
                         </tbody>
                     </table>
                 </div>
             </div>
 
+            <!-- Printable Sign-off (Shown in print only) -->
+            <div class="hidden print:block mt-12 print-break-inside">
+                <div class="grid grid-cols-2 gap-8 text-center">
+                    <div class="border border-slate-200 rounded-xl p-6 bg-slate-50/50">
+                        <p class="text-xs font-bold text-slate-400">ผู้ตรวจสอบและวิเคราะห์ข้อมูล</p>
+                        <div class="mt-12 mx-auto w-48 border-b border-slate-400 h-6"></div>
+                        <p class="text-xs font-bold text-slate-700 mt-3 flex items-center justify-center gap-1">
+                            <span>(</span>
+                            <span class="border-b border-dashed border-slate-300 px-4 py-0.5 outline-none font-semibold" contenteditable="true">ผู้ตรวจสอบวิเคราะห์</span>
+                            <span>)</span>
+                        </p>
+                        <p class="text-[10px] text-slate-400 font-bold mt-1">ตำแหน่ง: Procurement Specialist</p>
+                    </div>
+                    <div class="border border-slate-200 rounded-xl p-6 bg-slate-50/50">
+                        <p class="text-xs font-bold text-slate-400">ผู้อนุมัติความถูกต้องตามรายงาน</p>
+                        <div class="mt-12 mx-auto w-48 border-b border-slate-400 h-6"></div>
+                        <p class="text-xs font-bold text-slate-700 mt-3 flex items-center justify-center gap-1">
+                            <span>(</span>
+                            <span class="border-b border-dashed border-slate-300 px-4 py-0.5 outline-none font-semibold" contenteditable="true">ผู้อำนวยการส่วนจัดซื้อ</span>
+                            <span>)</span>
+                        </p>
+                        <p class="text-[10px] text-slate-400 font-bold mt-1">ตำแหน่ง: Director of Procurement</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Reference/Attribution Sources Section -->
-            <div id="sources-card" class="hidden bg-white rounded-[2rem] p-6 md:p-8 border border-slate-200 shadow-sm">
-                <h3 class="text-sm font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2.5 mb-5 no-print">
-                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h2a2.5 2.5 0 002.5-2.5V14a2 2 0 012-2h.09M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    แหล่งอ้างอิงข้อมูลเว็บราคากลางและการจำหน่ายจริง (Google Search Grounding)
+            <div id="sources-card" class="hidden bg-white rounded-[2rem] p-6 md:p-8 border border-slate-200 shadow-sm print-break-inside">
+                <h3 class="text-sm font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2.5 mb-5">
+                    <div class="bg-indigo-100 p-2 rounded-xl text-indigo-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h2a2.5 2.5 0 002.5-2.5V14a2 2 0 012-2h.09M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <span>หลักฐานอ้างอิงและราคากลางที่ค้นพบจริงในไทย (Google Search Grounding)</span>
                 </h3>
                 <div id="sources-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Dynamically populated -->
+                    <!-- Dynamically populated sources -->
                 </div>
             </div>
         </div>
@@ -262,70 +411,72 @@
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-8 px-4 text-center mt-auto no-print">
         <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-[0.25em]">
-            TOR Analyzer PRO &copy; 2026 | พัฒนาขึ้นโดยใช้เทคโนโลยีวิเคราะห์สเปกเพื่อความแม่นยำในการจัดซื้อจัดจ้าง
+            TOR Analyzer PRO Enterprise &copy; 2026 | ระบบช่วยเหลือความโปร่งใสในโครงการจัดซื้อภาครัฐและเอกชนไทย
         </p>
     </footer>
 
     <!-- Custom Notification Toast Panel -->
-    <div id="toast-panel" class="hidden fixed bottom-6 right-6 bg-slate-950 text-white py-3 px-5 rounded-2xl shadow-xl flex items-center gap-3 z-50 max-w-sm animate-fade-in">
-        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-        <p id="toast-message" class="text-xs font-semibold"></p>
+    <div id="toast-panel" class="hidden fixed bottom-6 right-6 bg-slate-950 text-white py-3.5 px-6 rounded-2xl shadow-xl flex items-center gap-3 z-50 max-w-sm animate-fade-in border border-slate-800">
+        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
+        <p id="toast-message" class="text-xs font-bold"></p>
     </div>
 
     <!-- Application Controller logic (JS) -->
     <script>
-        // System Config
-        const apiKey = ""; // Provided automatically in execution environment
+        // System Config - API Key Binded Securly
+        const apiKey = "AQ.Ab8RN6Kynga6m8UoSRhc0i9nFZHJd5gyFgTPHg54AjR66Y-jUg";
         
         // Application State
         let state = {
             torText: '',
             targetBrands: '',
             isAnalyzing: false,
-            specifications: [], // { id, category, requirement, importance }
-            products: [],       // { productName, scores: [{ specId, meetsRequirement, details }], overallSummary }
+            specifications: [],
+            products: [],
             activeTab: 'input',
             error: null,
             loadingStep: '',
-            groundingSources: [] // { title, uri }
+            groundingSources: [],
+            searchTerm: '',
+            filterImportance: 'ALL'
         };
 
         // Standard TOR Templates Database
         const templates = {
             'notebook-office': `รายละเอียดคุณลักษณะเฉพาะเครื่องคอมพิวเตอร์พกพา (Notebook) สำหรับงานสำนักงานทั่วไป
-1. มีหน่วยประมวลผลกลาง (CPU) ไม่น้อยกว่า 4 แกนหลัก (4 Cores) และความเร็วสัญญาณนาฬิกาพื้นฐานไม่น้อยกว่า 1.8 GHz
+1. มีหน่วยประมวลผลกลาง (CPU) ไม่น้อยกว่า 4 แกนหลัก (4 Cores) และมีความเร็วสัญญาณนาฬิกาพื้นฐานไม่น้อยกว่า 1.8 GHz
 2. มีหน่วยความจำหลัก (RAM) ชนิด DDR4 หรือ DDR5 มีขนาดไม่น้อยกว่า 16 GB
 3. มีหน่วยจัดเก็บข้อมูลแบบ SSD (Solid State Drive) ความจุไม่น้อยกว่า 512 GB ชนิด PCIe/NVMe
 4. หน้าจอแสดงผลมีขนาดไม่น้อยกว่า 14 นิ้ว มีความละเอียดไม่น้อยกว่า Full HD (1920x1080)
-5. มีการรับประกันชิ้นส่วนและบริการ (On-site Service) จากผู้ผลิตไม่น้อยกว่า 3 ปี`,
+5. มีพอร์ตการเชื่อมต่อครบถ้วน ได้แก่ USB 3.0, HDMI, และ Audio Jack
+6. มีการรับประกันชิ้นส่วนและบริการ (On-site Service) จากผู้ผลิตไม่น้อยกว่า 3 ปี`,
             
             'notebook-graphics': `คุณลักษณะเฉพาะระบบคอมพิวเตอร์แบบพกพาสมรรถนะสูง สำหรับงานวิเคราะห์ภาพถ่ายและกราฟิก
-1. ใช้หน่วยประมวลผลกลางความเร็วสูง แบบ 8 Cores (Intel Core i7 หรือ AMD Ryzen 7 ขึ้นไป หรือสเปกที่ดีกว่า) รุ่นปี 2023 ขึ้นไป
-2. ติดตั้งหน่วยความจำระบบ (RAM) ขนาดไม่น้อยกว่า 32 GB
-3. มีชิปประมวลผลกราฟิกแยก (Dedicated GPU) พร้อมหน่วยความจำการ์ดจอไม่น้อยกว่า 6 GB
+1. ใช้หน่วยประมวลผลกลางความเร็วสูง แบบ 8 Cores (Intel Core i7 หรือ AMD Ryzen 7 ขึ้นไป หรือสเปกที่ดีกว่า) รุ่นปี 2024 ขึ้นไป
+2. ติดตั้งหน่วยความจำระบบ (RAM) ขนาดไม่น้อยกว่า 32 GB ชนิด DDR5 ความเร็วไม่ต่ำกว่า 4800 MHz
+3. มีชิปประมวลผลกราฟิกแยก (Dedicated GPU) พร้อมหน่วยความจำการ์ดจอไม่น้อยกว่า 6 GB (NVIDIA RTX ซีรีส์ หรือเทียบเท่า)
 4. มีหน่วยบันทึกข้อมูลหลักความเร็วสูงแบบ NVMe M.2 SSD ขนาดไม่น้อยกว่า 1 TB
-5. หน้าจอมีความเที่ยงตรงของสีสูง ขอบเขตสี sRGB 100% ขนาดไม่ต่ำกว่า 15.6 นิ้ว
-6. ตัวเครื่องมีน้ำหนักรวมแบตเตอรี่ไม่เกิน 2.2 กิโลกรัม`,
+5. หน้าจอมีความเที่ยงตรงของสีสูง ขอบเขตสี sRGB 100% ขนาดไม่ต่ำกว่า 15.6 นิ้ว และความละเอียดไม่น้อยกว่า 2K (2560x1440)
+6. ตัวเครื่องมีน้ำหนักรวมแบตเตอรี่ไม่เกิน 2.2 กิโลกรัม รับประกัน 3 ปี เต็ม`,
 
             'server-storage': `คุณลักษณะเฉพาะเครื่องคอมพิวเตอร์แม่ข่าย (Server) สำหรับระบบบริการข้อมูลส่วนกลาง
-1. มีหน่วยประมวลผลกลาง (Processor) แบบไม่น้อยกว่า 8 Cores จำนวนไม่น้อยกว่า 1 หน่วย
-2. มีการประมวลผลข้อมูลในระดับความน่าเชื่อถือสูง รองรับการทำงานต่อเนื่อง (24/7)
-3. มีหน่วยความจำหลัก (RAM) ชนิด ECC (Error-Correcting Code) ขนาดไม่น้อยกว่า 64 GB
-4. รองรับการเชื่อมต่อหน่วยจัดเก็บข้อมูลแบบ Hot-Plug SAS หรือ SATA จำนวนไม่น้อยกว่า 8 ช่อง
-5. มีพอร์ตเชื่อมต่อเครือข่ายความเร็วสูง 10 Gbps LAN ไม่น้อยกว่า 2 พอร์ต
-6. รองรับการติดตั้งอุปกรณ์สำรองพลังงานไฟคู่ (Dual Redundant Power Supply)`
+1. มีหน่วยประมวลผลกลาง (Processor) แบบไม่น้อยกว่า 12 Cores จำนวนไม่น้อยกว่า 2 หน่วย
+2. มีการประมวลผลข้อมูลในระดับความน่าเชื่อถือสูง รองรับการทำงานต่อเนื่องแบบ (24/7)
+3. มีหน่วยความจำหลัก (RAM) ชนิด ECC (Error-Correcting Code) ขนาดไม่น้อยกว่า 128 GB
+4. รองรับการเชื่อมต่อหน่วยจัดเก็บข้อมูลแบบ Hot-Plug SAS หรือ SATA จำนวนไม่น้อยกว่า 8 ช่อง และรองรับ RAID 0, 1, 5, 10
+5. มีพอร์ตเชื่อมต่อเครือข่ายความเร็วสูง 10 Gbps SFP+ หรือ LAN ไม่น้อยกว่า 2 พอร์ต
+6. รองรับการติดตั้งอุปกรณ์สำรองพลังงานไฟคู่ (Dual Redundant Power Supply 80 Plus Platinum หรือดีกว่า)`
         };
 
-        // Initialize App on DOM Content Loaded
         window.onload = function() {
-            // Restore potential inputs from localStorage or state
             document.getElementById('tor-text').value = state.torText;
             document.getElementById('target-brands').value = state.targetBrands;
+            
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('print-date').textContent = new Date().toLocaleDateString('th-TH', options);
         };
 
-        // Render Application to match current state
         function render() {
-            // Control views toggle
             const tabs = ['input', 'specs', 'comparison'];
             tabs.forEach(tab => {
                 const el = document.getElementById(`tab-view-${tab}`);
@@ -336,9 +487,8 @@
                     btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all bg-white text-indigo-600 shadow-sm border border-slate-200/50";
                 } else {
                     el.classList.add('hidden');
-                    // Check if disabled
                     const isDisabled = (tab === 'specs' && state.specifications.length === 0) || 
-                                     (tab === 'comparison' && state.products.length === 0);
+                                       (tab === 'comparison' && state.products.length === 0);
                     
                     if (isDisabled) {
                         btn.setAttribute('disabled', 'true');
@@ -350,10 +500,16 @@
                 }
             });
 
-            // Update badge counts
             document.getElementById('spec-count-badge').textContent = state.specifications.length;
+            const btnExport = document.getElementById('btn-export');
+            if (state.specifications.length > 0) {
+                btnExport.removeAttribute('disabled');
+                btnExport.classList.remove('opacity-40', 'cursor-not-allowed');
+            } else {
+                btnExport.setAttribute('disabled', 'true');
+                btnExport.classList.add('opacity-40', 'cursor-not-allowed');
+            }
 
-            // Render Error Messages
             const errorAlert = document.getElementById('error-alert');
             const errorMessage = document.getElementById('error-message');
             if (state.error) {
@@ -363,7 +519,6 @@
                 errorAlert.classList.add('hidden');
             }
 
-            // Update Loading / Processing UI
             const startBtnIconNormal = document.getElementById('start-btn-icon-normal');
             const startBtnIconLoading = document.getElementById('start-btn-icon-loading');
             const startBtnText = document.getElementById('start-btn-text');
@@ -374,7 +529,7 @@
             if (state.isAnalyzing) {
                 startBtnIconNormal.classList.add('hidden');
                 startBtnIconLoading.classList.remove('hidden');
-                startBtnText.textContent = 'กำลังประมวลผลข้อมูล...';
+                startBtnText.textContent = 'กำลังทำงานร่วมกับ AI...';
                 btnStart.setAttribute('disabled', 'true');
                 btnStart.classList.replace('bg-indigo-600', 'bg-indigo-400');
                 btnStart.classList.add('cursor-not-allowed');
@@ -383,82 +538,78 @@
             } else {
                 startBtnIconNormal.classList.remove('hidden');
                 startBtnIconLoading.classList.add('hidden');
-                startBtnText.textContent = 'เริ่มวิเคราะห์ข้อมูลด้วย AI';
+                startBtnText.textContent = 'เริ่มวิเคราะห์สเปกด้วย AI';
                 btnStart.removeAttribute('disabled');
                 btnStart.classList.replace('bg-indigo-400', 'bg-indigo-600');
                 btnStart.classList.remove('cursor-not-allowed');
                 progressBox.classList.add('hidden');
             }
 
-            // Populate Specs List (Tab 2)
+            document.getElementById('print-tor-ref').textContent = state.torText || '-';
+            document.getElementById('print-brands-ref').textContent = state.targetBrands || 'สเปกมาตรฐานคู่เทียบแบรนด์ยอดนิยมในไทย';
+
             renderSpecsList();
-
-            // Populate Comparison Matrix (Tab 3)
+            renderStatsDashboard();
             renderComparisonMatrix();
-
-            // Populate Web Grounding Sources
             renderGroundingSources();
         }
 
-        // State controller helper
         function setState(updates) {
             state = { ...state, ...updates };
             render();
         }
 
-        // Switch to selected Tab
         function switchTab(tabId) {
-            // Prevent entering empty views
             if (tabId === 'specs' && state.specifications.length === 0) return;
             if (tabId === 'comparison' && state.products.length === 0) return;
-            
             setState({ activeTab: tabId });
         }
 
-        // Load TOR Template
         function loadTemplate(key) {
             if (!key) return;
             const templateText = templates[key];
             if (templateText) {
                 document.getElementById('tor-text').value = templateText;
                 state.torText = templateText;
-                showToast(`โหลดตัวอย่าง "${document.getElementById('template-selector').options[document.getElementById('template-selector').selectedIndex].text}" เรียบร้อยแล้ว`);
+                showToast(`โหลดตัวอย่าง "${document.getElementById('template-selector').options[document.getElementById('template-selector').selectedIndex].text}" เรียบร้อย`);
             }
         }
 
-        // Trigger dynamic system audit process
+        function filterSpecifications() {
+            const query = document.getElementById('search-spec-input').value.trim().toLowerCase();
+            const importance = document.getElementById('filter-importance').value;
+            setState({ searchTerm: query, filterImportance: importance });
+        }
+
         async function handleProcess() {
             const textValue = document.getElementById('tor-text').value.trim();
             const brandsValue = document.getElementById('target-brands').value.trim();
 
             if (!textValue) {
-                setState({ error: 'โปรดกรอกรายละเอียดข้อมูล TOR ก่อนดำเนินต่อ' });
+                setState({ error: 'กรุณากรอกเนื้อหาเกณฑ์สเปกหรือโหลดข้อมูลจำลองก่อนเริ่มวิเคราะห์' });
                 return;
             }
 
-            // Update inputs to local state
             state.torText = textValue;
             state.targetBrands = brandsValue;
 
             setState({
                 isAnalyzing: true,
                 error: null,
-                loadingStep: 'กำลังทำความเข้าใจเกณฑ์ TOR ภาษาไทยของคุณ...'
+                loadingStep: 'กำลังเตรียมเชื่อมต่อและวิเคราะห์โครงสร้างสเปก...'
             });
 
             try {
-                // Setup specific audit user query
-                const userQuery = `วิเคราะห์รายละเอียดคุณลักษณะเฉพาะ (TOR) ต่อไปนี้อย่างละเอียด และแยกสเปกออกเป็นข้อๆ: 
+                const userQuery = `วิเคราะห์เกณฑ์คุณลักษณะเฉพาะ (TOR) ภาษาไทยนี้อย่างละเอียด:
 "${state.torText}"
 
-รวมถึงเปรียบเทียบข้อมูลจำเพาะเชิงเทคนิค ความคุ้มค่า และการปฏิบัติตามกฎเกณฑ์ กับสินค้าจริงและยี่ห้อดังต่อไปนี้: "${state.targetBrands || 'สินค้าเป้าหมายสเปกยอดนิยมในตลาดปัจจุบัน'}"
-โดยทำการตรวจเช็กกับราคากลางและสเปกสินค้าอัปเดตในตลาดไทยปี 2024-2025`;
+ทำการสกัดเกณฑ์ที่สำคัญออกมาเป็นรายการ และสืบค้นตรวจสอบความเป็นไปได้ในการจัดหา เปรียบเทียบ ตรวจสอบความสอดคล้องตามมาตรฐาน (Compliance verification) กับผลิตภัณฑ์ในตลาดไทยปี 2024-2026: "${state.targetBrands || 'รุ่นเด่นยอดนิยมในไทย'}" 
+และอิงราคากลางจริง`;
 
-                // Run audit execution phase
                 const result = await runComplianceAuditor(userQuery);
 
                 if (!result.specs || !result.productComparison) {
-                    throw new Error("โครงสร้างผลลัพธ์จาก AI ขาดหายหรือไม่สอดคล้องกับพารามิเตอร์ที่กำหนด");
+                    throw new Error("โครงสร้างการวิเคราะห์ AI ไม่สมบูรณ์ กรุณาลองใหม่อีกครั้ง");
                 }
 
                 setState({
@@ -468,87 +619,104 @@
                     activeTab: 'specs'
                 });
                 
-                showToast("วิเคราะห์สเปกเสร็จสมบูรณ์เรียบร้อยแล้ว!");
+                showToast("AI ประมวลผลและจับคู่ความถูกต้องสเปกเสร็จสิ้น!");
             } catch (err) {
                 setState({
-                    error: `ระบบการวิเคราะห์ขัดข้องชั่วคราว: ${err.message}`,
+                    error: `พบข้อขัดข้องชั่วคราวในการประมวลผล: ${err.message}`,
                     isAnalyzing: false
                 });
             }
         }
 
-        // Master fetch system utilizing standard retry with exponential backoff
         async function runComplianceAuditor(userPrompt) {
-            const systemPrompt = `คุณคือ "Expert Procurement Auditor" ผู้เชี่ยวชาญระดับสูงด้านการวิเคราะห์ TOR และสืบราคากลางของประเทศไทย
-ภารกิจที่ต้องดำเนินการ:
-1. วิเคราะห์ข้อกำหนด TOR ภาษาไทย: สกัดเกณฑ์สเปกสำคัญ (Requirements) ออกมาเป็นข้อๆ ระบุ id (เช่น spec-1, spec-2), หมวดหมู่ไทย (category เช่น ซีพียู, แรม, หน้าจอ, การรับประกัน) และระดับความสำคัญ (importance เช่น High, Medium, Low)
-2. ค้นหาสินค้าและราคากลางจริง: ตรวจสอบข้อมูลผู้จำหน่ายจริงผ่าน Google Search ในประเทศไทย โดยระบุชื่อรุ่นที่สอดคล้องหรือรุ่นที่เจาะจงมา
-3. ตรวจสอบความถูกต้องตามขอบเขตข้อกำหนดอย่างเคร่งครัด (Compliance checking):
-   - เปรียบเทียบสินค้าคู่เทียบจริงที่วางจำหน่ายในไทยว่า meetsRequirement (true หรือ false) หรือไม่ และให้ระบุเหตุผลและคำอธิบายเป็นภาษาไทย
-4. สรุปภาพรวมเชิงยุทธวิธี (overallSummary): เขียนจุดเด่น จุดเสี่ยง หรือข้อคิดเห็นเกี่ยวกับสิทธิ์การจัดซื้อของแต่ละผู้สมัคร
+            const systemPrompt = `คุณคือ "Expert Procurement Auditor" นักวิเคราะห์และสกัดคุณสมบัติสเปกจัดซื้อจัดจ้าง (TOR) ชั้นนำในไทย
+ข้อบังคับที่ต้องปฏิบัติตามอย่างรอบคอบ:
+1. วิเคราะห์ข้อความสเปกภาษาไทยที่ได้รับ แล้วแตกออกมาเป็นประเด็นสเปกหลัก (Requirements) แยกเป็นข้อๆ ละเอียด
+2. ในส่วน "specs": ระบุ id (เช่น spec-1, spec-2), หมวดหมู่ภาษาไทย (category เช่น ตัวประมวลผล, แรม, ความจุ, การประกัน, มาตรฐาน), เกณฑ์ที่ต้องการ (requirement), และ ระดับความสำคัญ (importance: "High", "Medium", "Low")
+3. ในส่วน "productComparison": ค้นหาและเปรียบเทียบกับผลิตภัณฑ์จริง 2 แบรนด์/รุ่น ที่สอดคล้องหรือจำหน่ายในประเทศไทยเวลานี้ โดยระบุชื่อแบรนด์และรุ่นในประเทศไทยให้ครบถ้วนใน "productName"
+4. ในอาเรย์ "scores": ทำการวิเคราะห์เปรียบเทียบทีละข้อกำหนด (specId) ตรวจดูว่าแบรนด์นั้นสอดคล้องตามเกณฑ์ขั้นต่ำหรือไม่ ("meetsRequirement": true หรือ false) และเขียนสรุปสั้นกระชับเข้าใจง่ายเป็นภาษาไทยในช่อง "details"
+5. เขียน "overallSummary" สรุปข้อพึงระวัง ความเสี่ยงการล็อกสเปก หรือคำแนะนำทางเทคนิคการเสนอราคาของแต่ละแบรนด์ให้ชัดเจน
 
-ตอบกลับข้อมูลเป็นรูปแบบ JSON ตาม Schema ที่กําหนดไว้เท่านั้น ห้ามใส่เครื่องหมายพิเศษหรือตัวอักษรภายนอกบล็อก JSON`;
+ตอบกลับเฉพาะโครงสร้าง JSON เปล่าๆ ไม่ต้องมีอักขระหรือคำนำหน้าอื่นนอกบล็อก JSON ใดๆ ทั้งสิ้น`;
 
-            const payload = {
-                contents: [{ parts: [{ text: userPrompt }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-                tools: [{ "google_search": {} }],
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "OBJECT",
-                        properties: {
-                            specs: {
-                                type: "ARRAY",
-                                items: {
-                                    type: "OBJECT",
-                                    properties: {
-                                        id: { type: "STRING" },
-                                        category: { type: "STRING" },
-                                        requirement: { type: "STRING" },
-                                        importance: { type: "STRING" }
-                                    },
-                                    required: ["id", "category", "requirement", "importance"]
-                                }
-                            },
-                            productComparison: {
-                                type: "ARRAY",
-                                items: {
-                                    type: "OBJECT",
-                                    properties: {
-                                        productName: { type: "STRING" },
-                                        scores: {
-                                            type: "ARRAY",
-                                            items: {
-                                                type: "OBJECT",
-                                                properties: {
-                                                    specId: { type: "STRING" },
-                                                    meetsRequirement: { type: "BOOLEAN" },
-                                                    details: { type: "STRING" }
-                                                },
-                                                required: ["specId", "meetsRequirement", "details"]
-                                            }
-                                        },
-                                        overallSummary: { type: "STRING" }
-                                    },
-                                    required: ["productName", "scores", "overallSummary"]
-                                }
+            const baseConfig = {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: "OBJECT",
+                    properties: {
+                        specs: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: {
+                                    id: { type: "STRING" },
+                                    category: { type: "STRING" },
+                                    requirement: { type: "STRING" },
+                                    importance: { type: "STRING" }
+                                },
+                                required: ["id", "category", "requirement", "importance"]
                             }
                         },
-                        required: ["specs", "productComparison"]
-                    }
+                        productComparison: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: {
+                                    productName: { type: "STRING" },
+                                    scores: {
+                                        type: "ARRAY",
+                                        items: {
+                                            type: "OBJECT",
+                                            properties: {
+                                                specId: { type: "STRING" },
+                                                meetsRequirement: { type: "BOOLEAN" },
+                                                details: { type: "STRING" }
+                                            },
+                                            required: ["specId", "meetsRequirement", "details"]
+                                        }
+                                    },
+                                    overallSummary: { type: "STRING" }
+                                },
+                                required: ["productName", "scores", "overallSummary"]
+                            }
+                        }
+                    },
+                    required: ["specs", "productComparison"]
                 }
             };
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            
+            // Model Fallback Matrix to prevent 404/403/400 errors
+            const models = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-2.5-flash-preview-09-2025"];
+            let modelIndex = 0;
             let retries = 0;
             const maxRetries = 5;
-            
+            let useSearchTool = true;
+            let useSchema = true;
+
             while (retries <= maxRetries) {
                 try {
-                    // Simulating step status updating
-                    updateProcessingStatus(retries);
+                    const activeModel = models[modelIndex % models.length];
+                    updateProcessingStatus(retries, useSearchTool, activeModel);
+
+                    const payload = {
+                        contents: [{ parts: [{ text: userPrompt }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                        generationConfig: {
+                            responseMimeType: "application/json"
+                        }
+                    };
+
+                    // Include Schema Constraints only if useSchema is true
+                    if (useSchema) {
+                        payload.generationConfig.responseSchema = baseConfig.responseSchema;
+                    }
+
+                    // Include Google Search grounding only if useSearchTool is true
+                    if (useSearchTool) {
+                        payload.tools = [{ "google_search": {} }];
+                    }
+
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${apiKey}`;
 
                     const response = await fetch(url, {
                         method: 'POST',
@@ -556,16 +724,48 @@
                         body: JSON.stringify(payload)
                     });
 
+                    // 1. Auto Fallback on 404 Not Found (Model selection switch)
+                    if (response.status === 404) {
+                        modelIndex++;
+                        if (modelIndex >= models.length) {
+                            throw new Error("ไม่มีโมเดล AI ใดในระบบสารสนเทศพร้อมใช้สำหรับ Key ของคุณ (404 Not Found)");
+                        }
+                        showToast(`สลับใช้งานโมเดลวิเคราะห์สำรอง: ${models[modelIndex % models.length]}...`);
+                        continue; // Fast fallback retry
+                    }
+
+                    // 2. Auto Fallback on 403 Forbidden (Search Tool Restricted)
+                    if (response.status === 403 && useSearchTool) {
+                        useSearchTool = false;
+                        retries = 0; // Reset retries for search-less execution
+                        showToast("เปิดใช้งานโหมดประมวลผลมาตรฐานประสิทธิภาพสูง (ข้าม Google Live Search)...");
+                        continue;
+                    }
+
+                    // 3. Auto Fallback on 400 Bad Request (Conflict between strict Schema + Tools or Model limit)
+                    if (response.status === 400) {
+                        if (useSearchTool) {
+                            useSearchTool = false;
+                            retries = 0;
+                            showToast("พบข้อผิดพลาด 400: กำลังปิดเครื่องมือสืบค้นสดเพื่อแก้ไขสิทธิ์ทับซ้อน...");
+                            continue;
+                        } else if (useSchema) {
+                            useSchema = false;
+                            retries = 0;
+                            showToast("พบข้อผิดพลาด 400: สลับเข้าสู่โหมดวิเคราะห์โครงสร้างยืดหยุ่น...");
+                            continue;
+                        }
+                    }
+
                     if (!response.ok) {
                         throw new Error(`API Error Status: ${response.status}`);
                     }
 
                     const rawData = await response.json();
                     
-                    // Extract Grounding Citations
                     const attributions = rawData.candidates?.[0]?.groundingMetadata?.groundingAttributions || [];
                     const extractedSources = attributions.map(item => ({
-                        title: item.web?.title || 'แหล่งข้อมูลอ้างอิงราคากลาง',
+                        title: item.web?.title || 'ลิงก์และราคากลางอ้างอิงจริง',
                         uri: item.web?.uri
                     })).filter(source => source.uri);
 
@@ -573,10 +773,24 @@
 
                     const generatedText = rawData.candidates?.[0]?.content?.parts?.[0]?.text;
                     if (!generatedText) {
-                        throw new Error("ไม่มีผลลัพธ์ข้อความถูกส่งกลับมาจากโมเดลประมวลผล");
+                        throw new Error("ระบบ AI ไม่ตอบกลับผลลัพธ์การจัดซื้อจัดจ้าง");
                     }
 
-                    return JSON.parse(generatedText);
+                    const parsedData = JSON.parse(generatedText);
+
+                    // Ensure JSON structure matches UI requirements if schema-enforcement was bypassed
+                    if (!parsedData.specs) {
+                        parsedData.specs = [];
+                    }
+                    if (!parsedData.productComparison) {
+                        parsedData.productComparison = [];
+                    }
+                    parsedData.productComparison.forEach(prod => {
+                        if (!prod.scores) prod.scores = [];
+                        if (!prod.overallSummary) prod.overallSummary = "";
+                    });
+
+                    return parsedData;
                 } catch (err) {
                     if (retries === maxRetries) {
                         throw err;
@@ -588,58 +802,125 @@
             }
         }
 
-        // Update active loading text during retries and execution
-        function updateProcessingStatus(retryCount) {
-            const steps = [
-                'กำลังเชื่อมต่อกับ AI Auditor และเปิดระบบสืบราคากลางบนเว็บ...',
-                'กำลังประมวลภาษาไทยและระบุมาตรฐานเกณฑ์ขั้นต่ำ...',
-                'กำลังเทียบสินค้าในท้องตลาดปี 2024-2025 จากแหล่งข่าวจำหน่ายในประเทศไทย...',
-                'กำลังจัดรูปรายงานสรุปความสอดคล้องตามเกณฑ์...',
-                'กำลังทำความสะอาดและตรวจสอบความเสถียรของตาราง JSON...'
+        function updateProcessingStatus(retryCount, useSearchTool = true, activeModel = "") {
+            const stepsWithSearch = [
+                `กำลังประสานงานโมเดล ${activeModel} ค้นข้อมูลตลาดประเทศไทย...`,
+                'กำลังทำความเข้าใจเกณฑ์ TOR ภาษาไทย และจับคู่กับข้อมูลที่สืบค้นได้...',
+                'กำลังจัดระดับคะแนนความสำคัญและความท้าทายในสัญญาราชการ...',
+                'กำลังรวบรวมขอบเขตเพื่อป้องกันความเสี่ยงการจัดซื้อและหลีกเลี่ยงการล็อกสเปก...',
+                'กำลังทำความสะอาดและตรวจสอบโครงสร้างคำนวณสถิติ...'
             ];
-            const currentStep = retryCount < steps.length ? steps[retryCount] : 'กำลังพยายามจัดส่งผลลัพธ์ใหม่อีกครั้ง...';
+            const stepsWithoutSearch = [
+                `กำลังสลับเข้าโหมดประมวลผลภายใน ${activeModel}...`,
+                'กำลังประมวลผลภาษาไทยและเปรียบเทียบจากฐานความรู้ผลิตภัณฑ์เชิงลึก...',
+                'กำลังจัดสเปกความสำคัญรายข้อและประเมินแบรนด์คู่เทียบ...',
+                'กำลังจัดวางคะแนนเกณฑ์และสรุปการหลีกเลี่ยงการล็อกสเปก...',
+                'กำลังวิเคราะห์ความถูกต้องและสรุปรายงานตารางเปรียบเทียบ...'
+            ];
+
+            const steps = useSearchTool ? stepsWithSearch : stepsWithoutSearch;
+            const currentStep = retryCount < steps.length ? steps[retryCount] : 'กำลังพยายามประสานงานเพื่อกู้คืนสัญญากับเซิร์ฟเวอร์...';
             setState({ loadingStep: currentStep });
         }
 
-        // Render Specs List with editable properties
-        function renderSpecsList() {
-            const container = document.getElementById('specs-grid-container');
-            container.innerHTML = '';
+        function renderStatsDashboard() {
+            const totalSpecs = state.specifications.length;
+            const highSpecs = state.specifications.filter(s => s.importance === 'High').length;
 
-            if (state.specifications.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full py-16 text-center text-slate-400 font-bold">
-                        ไม่พบข้อกำหนดที่บันทึก โปรดวิเคราะห์สเปกหรือเพิ่มข้อมูลนำเข้าก่อน
+            document.getElementById('stat-total-specs').textContent = totalSpecs;
+            document.getElementById('stat-high-specs').textContent = highSpecs;
+            document.getElementById('dashboard-total-products').textContent = `${state.products.length} ผลิตภัณฑ์`;
+
+            const barsContainer = document.getElementById('candidate-metrics-bars');
+            barsContainer.innerHTML = '';
+
+            if (state.products.length === 0) {
+                barsContainer.innerHTML = `
+                    <div class="text-center text-slate-400 py-6 text-xs font-semibold">
+                        รอข้อมูลจากการวิเคราะห์เพื่อคำนวณสถิติ
                     </div>
                 `;
                 return;
             }
 
-            state.specifications.forEach(spec => {
-                const priorityClass = spec.importance === 'High' ? 'bg-rose-50 text-rose-600' : 'bg-slate-50 text-slate-500';
+            state.products.forEach((prod) => {
+                const totalScores = prod.scores.length;
+                const passedScores = prod.scores.filter(s => s.meetsRequirement).length;
+                const percent = totalScores > 0 ? Math.round((passedScores / totalScores) * 100) : 0;
+
+                let colorClass = 'bg-emerald-500';
+                if (percent < 50) colorClass = 'bg-rose-500';
+                else if (percent < 80) colorClass = 'bg-amber-500';
+
+                const barEl = document.createElement('div');
+                barEl.className = "space-y-1.5";
+                barEl.innerHTML = `
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-extrabold text-slate-700">${prod.productName}</span>
+                        <span class="font-black text-indigo-600">${passedScores}/${totalScores} ข้อความต้องการ (${percent}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full ${colorClass} transition-all duration-500" style="width: ${percent}%"></div>
+                    </div>
+                `;
+                barsContainer.appendChild(barEl);
+            });
+        }
+
+        function renderSpecsList() {
+            const container = document.getElementById('specs-grid-container');
+            container.innerHTML = '';
+
+            const filtered = state.specifications.filter(spec => {
+                const matchesSearch = spec.requirement.toLowerCase().includes(state.searchTerm) || 
+                                      spec.category.toLowerCase().includes(state.searchTerm);
+                const matchesImportance = state.filterImportance === 'ALL' || spec.importance === state.filterImportance;
+                return matchesSearch && matchesImportance;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-16 text-center text-slate-400 font-bold bg-white rounded-[2rem] border border-dashed border-slate-200">
+                        ไม่พบข้อกำหนดที่สอดคล้องกับการค้นหาหรือตัวกรองที่เลือก
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(spec => {
+                const priorityClass = spec.importance === 'High' 
+                    ? 'bg-rose-100 text-rose-700 border border-rose-200' 
+                    : spec.importance === 'Medium'
+                        ? 'bg-amber-100 text-amber-700 border border-amber-200'
+                        : 'bg-slate-100 text-slate-600 border border-slate-200';
+
                 const card = document.createElement('div');
                 card.className = "bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:border-indigo-300 transition-all relative overflow-hidden flex flex-col justify-between";
                 card.innerHTML = `
                     <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500 opacity-20"></div>
                     <div class="space-y-4">
                         <div class="flex justify-between items-start gap-2">
-                            <span class="text-[10px] font-black text-indigo-600 uppercase tracking-wider bg-indigo-50 px-2.5 py-1 rounded-lg">${spec.category}</span>
+                            <input type="text" value="${spec.category}" onchange="updateSpecField('${spec.id}', 'category', this.value)" class="text-[10px] font-black text-indigo-700 uppercase tracking-wider bg-indigo-50 border-none px-2.5 py-1 rounded-lg w-2/3 focus:ring-1 focus:ring-indigo-300 outline-none" />
                             <div class="flex items-center gap-1.5">
-                                <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full ${priorityClass}">${spec.importance}</span>
-                                <button onclick="deleteSpec('${spec.id}')" class="text-slate-300 hover:text-rose-500 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                <select onchange="updateSpecField('${spec.id}', 'importance', this.value)" class="text-[9px] font-extrabold px-2 py-0.5 rounded-full ${priorityClass} cursor-pointer outline-none">
+                                    <option value="High" ${spec.importance === 'High' ? 'selected' : ''}>High</option>
+                                    <option value="Medium" ${spec.importance === 'Medium' ? 'selected' : ''}>Medium</option>
+                                    <option value="Low" ${spec.importance === 'Low' ? 'selected' : ''}>Low</option>
+                                </select>
+                                <button onclick="deleteSpec('${spec.id}')" class="text-slate-300 hover:text-rose-500 transition-colors p-1 rounded-md hover:bg-slate-50">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                 </button>
                             </div>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 tracking-wide uppercase">เกณฑ์ความต้องการทางเทคนิค</label>
-                            <textarea onchange="updateSpecRequirement('${spec.id}', this.value)" class="w-full text-sm text-slate-700 font-bold bg-transparent border-none hover:bg-slate-50 focus:bg-slate-50 focus:ring-1 focus:ring-indigo-300 rounded-xl p-2 leading-relaxed resize-none transition-all" rows="4">${spec.requirement}</textarea>
+                            <label class="text-[9px] font-bold text-slate-400 tracking-wide uppercase">ข้อกำหนดเกณฑ์ความต้องการ</label>
+                            <textarea onchange="updateSpecField('${spec.id}', 'requirement', this.value)" class="w-full text-xs text-slate-700 font-bold bg-slate-50 border border-slate-100 hover:bg-slate-100/50 focus:bg-white focus:ring-1 focus:ring-indigo-300 rounded-xl p-2.5 leading-relaxed resize-none transition-all" rows="3">${spec.requirement}</textarea>
                         </div>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-50 flex justify-between items-center text-[10px] font-bold text-slate-400">
                         <span>ID: ${spec.id}</span>
                         <span class="text-indigo-400 flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                             แก้ไขได้ทันที
                         </span>
                     </div>
@@ -648,22 +929,25 @@
             });
         }
 
-        // Inline edit dynamic handlers
-        function updateSpecRequirement(id, text) {
+        function updateSpecField(id, field, value) {
             const updated = state.specifications.map(spec => {
                 if (spec.id === id) {
-                    return { ...spec, requirement: text };
+                    return { ...spec, [field]: value };
                 }
                 return spec;
             });
             setState({ specifications: updated });
-            showToast("อัปเดตข้อกำหนดเรียบร้อยแล้ว");
+            showToast("อัปเดตข้อมูลเกณฑ์สเปกสำเร็จ");
         }
 
         function deleteSpec(id) {
-            const filtered = state.specifications.filter(spec => spec.id !== id);
-            setState({ specifications: filtered });
-            showToast("ลบข้อกำหนดที่เลือกแล้ว");
+            const filteredSpecs = state.specifications.filter(s => s.id !== id);
+            const updatedProducts = state.products.map(prod => ({
+                ...prod,
+                scores: prod.scores.filter(s => s.specId !== id)
+            }));
+            setState({ specifications: filteredSpecs, products: updatedProducts });
+            showToast("ลบเกณฑ์การตรวจสอบแล้ว");
         }
 
         function addNewSpecification() {
@@ -671,14 +955,22 @@
             const newSpec = {
                 id: newId,
                 category: 'หมวดหมู่อื่นๆ',
-                requirement: 'พิมพ์ข้อมูลความต้องการที่ต้องการเพิ่มเติมที่นี่...',
+                requirement: 'ข้อกำหนดคุณลักษณะความละเอียดเพิ่มเติมที่ต้องการ...',
                 importance: 'Medium'
             };
-            setState({ specifications: [...state.specifications, newSpec] });
-            showToast("เพิ่มเกณฑ์มาตรฐานใหม่เรียบร้อยแล้ว");
+
+            const updatedProducts = state.products.map(prod => ({
+                ...prod,
+                scores: [...prod.scores, { specId: newId, meetsRequirement: true, details: 'ผู้จัดหาสามารถดำเนินการจัดหารายการพิเศษนี้ได้' }]
+            }));
+
+            setState({ 
+                specifications: [...state.specifications, newSpec],
+                products: updatedProducts
+            });
+            showToast("เพิ่มเกณฑ์มาตรฐานใหม่ในระบบแล้ว");
         }
 
-        // Render comparison view grid and pass evaluation
         function renderComparisonMatrix() {
             const headerRow = document.getElementById('matrix-header-row');
             const body = document.getElementById('matrix-body');
@@ -688,72 +980,71 @@
 
             if (state.products.length === 0) return;
 
-            // 1. Create table headers
             const headerCellMain = document.createElement('th');
-            headerCellMain.className = "p-6 md:p-8 text-slate-400 font-extrabold uppercase text-[10px] tracking-[0.15em] w-[40%] text-left";
+            headerCellMain.className = "p-6 text-slate-400 font-extrabold uppercase text-[10px] tracking-[0.15em] w-[40%] text-left";
             headerCellMain.textContent = "เกณฑ์ข้อกำหนดทางเทคนิค (TOR)";
             headerRow.appendChild(headerCellMain);
 
             state.products.forEach((prod, index) => {
                 const headCell = document.createElement('th');
-                headCell.className = "p-6 md:p-8 text-center border-l border-slate-100 w-[30%]";
+                headCell.className = "p-6 text-center border-l border-slate-200 w-[30%]";
                 headCell.innerHTML = `
-                    <div class="bg-indigo-50 inline-block px-3 py-1 rounded-full text-[9px] text-indigo-600 font-black mb-2 uppercase tracking-wider">Candidate ${index + 1}</div>
-                    <div class="text-slate-800 font-extrabold text-base leading-tight uppercase tracking-tight">${prod.productName}</div>
+                    <div class="bg-indigo-50 inline-block px-3 py-1 rounded-full text-[9px] text-indigo-600 font-black mb-2 uppercase tracking-wider">แบรนด์ที่ ${index + 1}</div>
+                    <div class="text-slate-800 font-extrabold text-sm leading-tight uppercase tracking-tight outline-none" contenteditable="true" onblur="updateProductName(${index}, this.textContent)">${prod.productName}</div>
                 `;
                 headerRow.appendChild(headCell);
             });
 
-            // 2. Loop on specifications to construct table rows
             state.specifications.forEach((spec, specIdx) => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50/50 transition-colors border-b border-slate-100";
+                tr.className = "hover:bg-slate-50/50 transition-colors border-b border-slate-100 print-break-inside";
 
-                // Standard Column (Requirement Details)
                 const tdReq = document.createElement('td');
-                tdReq.className = "p-6 md:p-8 align-top";
+                tdReq.className = "p-6 align-top";
                 tdReq.innerHTML = `
-                    <div class="flex items-start gap-4">
-                        <div class="w-7 h-7 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 font-extrabold text-xs flex-shrink-0 mt-0.5">
+                    <div class="flex items-start gap-3">
+                        <div class="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 font-extrabold text-[10px] flex-shrink-0 mt-0.5">
                             ${specIdx + 1}
                         </div>
                         <div>
-                            <div class="text-[9px] text-indigo-500 font-extrabold mb-1.5 uppercase tracking-wide">${spec.category}</div>
-                            <div class="text-slate-800 font-semibold text-sm leading-relaxed">${spec.requirement}</div>
+                            <div class="text-[9px] text-indigo-500 font-extrabold mb-1 uppercase tracking-wide">${spec.category} • ความสำคัญ: ${spec.importance}</div>
+                            <div class="text-slate-800 font-semibold text-xs leading-relaxed">${spec.requirement}</div>
                         </div>
                     </div>
                 `;
                 tr.appendChild(tdReq);
 
-                // Populate matched compliance results
-                state.products.forEach(product => {
-                    const matchedScore = product.scores?.find(s => s.specId === spec.id);
+                state.products.forEach((product, prodIdx) => {
+                    const matchedScoreIndex = product.scores?.findIndex(s => s.specId === spec.id);
+                    const matchedScore = matchedScoreIndex !== -1 ? product.scores[matchedScoreIndex] : null;
+                    
                     const isPassed = matchedScore ? matchedScore.meetsRequirement : false;
-                    const explanationText = matchedScore ? matchedScore.details : 'ไม่มีข้อมูลการตรวจเช็คในระบบ';
+                    const explanationText = matchedScore ? matchedScore.details : 'ไม่มีข้อมูลการตรวจเช็กในระบบ';
 
                     const tdScore = document.createElement('td');
-                    tdScore.className = "p-6 md:p-8 text-center border-l border-slate-100 align-top";
+                    tdScore.className = "p-6 text-center border-l border-slate-100 align-top";
 
                     const badgeStyle = isPassed 
-                        ? 'bg-emerald-500 text-white' 
-                        : 'bg-rose-500 text-white';
+                        ? 'bg-emerald-500 hover:bg-emerald-600 text-white cursor-pointer' 
+                        : 'bg-rose-500 hover:bg-rose-600 text-white cursor-pointer';
 
                     const badgeIcon = isPassed
-                        ? `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`
-                        : `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>`;
+                        ? `<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>`
+                        : `<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>`;
 
                     const descBoxStyle = isPassed
                         ? 'bg-emerald-50/50 text-emerald-800 border border-emerald-100'
                         : 'bg-rose-50/50 text-rose-800 border border-rose-100';
 
                     tdScore.innerHTML = `
-                        <div class="flex flex-col items-center gap-3">
-                            <div class="p-1.5 rounded-full ${badgeStyle} shadow-sm">
+                        <div class="flex flex-col items-center gap-2">
+                            <button onclick="toggleCompliance(${prodIdx}, '${spec.id}')" class="p-1 rounded-full ${badgeStyle} shadow-sm transition-all focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 no-print" title="คลิกเพื่อสลับ ผ่าน / ไม่ผ่าน">
                                 ${badgeIcon}
+                            </button>
+                            <div class="hidden print:flex items-center gap-1 justify-center text-[10px] font-bold ${isPassed ? 'text-emerald-600' : 'text-rose-600'}">
+                                ${isPassed ? '✓ ผ่านสเปก' : '✗ ตกสเปก'}
                             </div>
-                            <p class="text-xs font-semibold p-3 rounded-2xl max-w-[240px] text-left leading-relaxed ${descBoxStyle}">
-                                ${explanationText}
-                            </p>
+                            <textarea onchange="updateComplianceDetail(${prodIdx}, '${spec.id}', this.value)" class="w-full text-xs font-semibold p-2.5 rounded-xl text-left leading-relaxed resize-none outline-none focus:ring-1 focus:ring-indigo-300 transition-all ${descBoxStyle}" rows="2">${explanationText}</textarea>
                         </div>
                     `;
                     tr.appendChild(tdScore);
@@ -762,29 +1053,26 @@
                 body.appendChild(tr);
             });
 
-            // 3. Final Overall AI Summary Strategic row
             const trSummary = document.createElement('tr');
-            trSummary.className = "bg-slate-900 text-white print:bg-slate-100 print:text-black";
+            trSummary.className = "bg-slate-900 text-white print:bg-slate-100 print:text-black print-break-inside";
 
             const tdSummaryTitle = document.createElement('td');
-            tdSummaryTitle.className = "p-6 md:p-8 align-top";
+            tdSummaryTitle.className = "p-6 align-top";
             tdSummaryTitle.innerHTML = `
-                <div class="flex items-center gap-2 mb-2">
-                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.373-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
-                    <h4 class="font-extrabold text-sm uppercase tracking-wider">AI Procurement Audit Note</h4>
+                <div class="flex items-center gap-2 mb-1.5">
+                    <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.373-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+                    <h4 class="font-extrabold text-xs uppercase tracking-wider">AI Audit strategic overview</h4>
                 </div>
-                <p class="text-[10px] text-slate-400 font-bold leading-relaxed">บทวิจารณ์และประเมินภาพรวมความเสี่ยงโดย AI</p>
+                <p class="text-[9px] text-slate-400 font-bold leading-relaxed">บทวิจารณ์เชิงลึกและความพร้อมในการส่งมอบเพื่อป้องกันการล็อกสเปก</p>
             `;
             trSummary.appendChild(tdSummaryTitle);
 
-            state.products.forEach(product => {
+            state.products.forEach((product, idx) => {
                 const tdSummaryDesc = document.createElement('td');
-                tdSummaryDesc.className = "p-6 md:p-8 border-l border-slate-800 align-top";
+                tdSummaryDesc.className = "p-6 border-l border-slate-800 print:border-slate-300 align-top";
                 tdSummaryDesc.innerHTML = `
-                    <div class="bg-white/5 border border-white/10 rounded-2xl p-5 print:border-slate-300 print:bg-white">
-                        <p class="text-slate-300 text-xs font-semibold leading-relaxed italic print:text-slate-800">
-                            "${product.overallSummary || 'ผ่านคุณลักษณะขั้นต่ำส่วนใหญ่ เหมาะสำหรับการเสนอราคาอย่างเป็นทางการ'}"
-                        </p>
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4 print:border-slate-300 print:bg-white">
+                        <textarea onchange="updateOverallSummary(${idx}, this.value)" class="bg-transparent text-slate-300 text-xs font-semibold leading-relaxed w-full border-none focus:ring-0 resize-none print:text-slate-800 outline-none" rows="3">${product.overallSummary || 'สอดคล้องตามคุณสมบัติพื้นฐานเกือบทั้งหมด เหมาะสำหรับการใช้ยื่นเสนอโครงการจัดซื้อจัดจ้างภาครัฐหรือเอกชน'}</textarea>
                     </div>
                 `;
                 trSummary.appendChild(tdSummaryDesc);
@@ -793,7 +1081,40 @@
             body.appendChild(trSummary);
         }
 
-        // Render reference websites links
+        function updateProductName(index, name) {
+            const updatedProducts = [...state.products];
+            updatedProducts[index].productName = name.trim();
+            setState({ products: updatedProducts });
+            showToast("อัปเดตชื่อผู้เสนอราคาใหม่สำเร็จ");
+        }
+
+        function toggleCompliance(productIndex, specId) {
+            const updatedProducts = [...state.products];
+            const scoreIndex = updatedProducts[productIndex].scores.findIndex(s => s.specId === specId);
+            if (scoreIndex !== -1) {
+                updatedProducts[productIndex].scores[scoreIndex].meetsRequirement = !updatedProducts[productIndex].scores[scoreIndex].meetsRequirement;
+                setState({ products: updatedProducts });
+                showToast("แก้ไขสถานะผ่าน/ไม่ผ่านสำเร็จ");
+            }
+        }
+
+        function updateComplianceDetail(productIndex, specId, text) {
+            const updatedProducts = [...state.products];
+            const scoreIndex = updatedProducts[productIndex].scores.findIndex(s => s.specId === specId);
+            if (scoreIndex !== -1) {
+                updatedProducts[productIndex].scores[scoreIndex].details = text;
+                setState({ products: updatedProducts });
+                showToast("บันทึกการระบุข้อมูลคู่เทียบเรียบร้อย");
+            }
+        }
+
+        function updateOverallSummary(productIndex, text) {
+            const updatedProducts = [...state.products];
+            updatedProducts[productIndex].overallSummary = text;
+            setState({ products: updatedProducts });
+            showToast("อัปเดตบทวิจารณ์ภาพรวมเรียบร้อย");
+        }
+
         function renderGroundingSources() {
             const card = document.getElementById('sources-card');
             const container = document.getElementById('sources-list-container');
@@ -806,25 +1127,76 @@
 
             card.classList.remove('hidden');
             
-            state.groundingSources.forEach((source, index) => {
-                const domain = new URL(source.uri).hostname;
+            state.groundingSources.forEach((source) => {
+                let domain = 'แหล่งข้อมูลอ้างอิง';
+                try {
+                    domain = new URL(source.uri).hostname;
+                } catch(e) {}
+                
                 const item = document.createElement('a');
                 item.href = source.uri;
                 item.target = '_blank';
                 item.rel = 'noopener noreferrer';
-                item.className = "flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-all group shadow-sm";
+                item.className = "flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-all group shadow-sm no-print";
                 item.innerHTML = `
                     <div class="flex flex-col gap-1 overflow-hidden">
                         <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider truncate">${domain}</span>
-                        <span class="text-xs font-bold text-slate-700 truncate group-hover:text-indigo-600 transition-colors">${source.title || 'ข้อมูลผลิตภัณฑ์สืบค้นจริง'}</span>
+                        <span class="text-xs font-bold text-slate-700 truncate group-hover:text-indigo-600 transition-colors">${source.title || 'เอกสารจำหน่ายและราคากลางจริง'}</span>
                     </div>
-                    <svg class="w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                    <svg class="w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                 `;
                 container.appendChild(item);
             });
         }
 
-        // Action Toast Panel message
+        // Export State to JSON file
+        function triggerExport() {
+            if (state.specifications.length === 0) return;
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `tor-compliance-session-${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("ส่งออกแฟ้มเซสชัน JSON สำเร็จแล้ว!");
+        }
+
+        // Import State from JSON file
+        function triggerImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed.specifications && parsed.products) {
+                        state = {
+                            ...state,
+                            torText: parsed.torText || '',
+                            targetBrands: parsed.targetBrands || '',
+                            specifications: parsed.specifications || [],
+                            products: parsed.products || [],
+                            groundingSources: parsed.groundingSources || [],
+                            activeTab: 'specs'
+                        };
+                        
+                        document.getElementById('tor-text').value = state.torText;
+                        document.getElementById('target-brands').value = state.targetBrands;
+                        
+                        render();
+                        showToast("นำเข้าเซสชันเสร็จสิ้น!");
+                    } else {
+                        throw new Error("โครงสร้างไฟล์ JSON ไม่ถูกต้องสำหรับเซสชันนี้");
+                    }
+                } catch(err) {
+                    setState({ error: `ไม่สามารถนำเข้าไฟล์: ${err.message}` });
+                }
+            };
+            reader.readAsText(file);
+        }
+
         function showToast(message) {
             const panel = document.getElementById('toast-panel');
             const text = document.getElementById('toast-message');
