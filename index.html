@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOR ANALYZER PRO - AI Procurement Compliance Auditor</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Anuphan for elegant Thai typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Anuphan', sans-serif;
+            background-color: #f8fafc;
+        }
+        @media print {
+            nav, .no-print, button, footer {
+                display: none !important;
+            }
+            .print-full {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .card-flat {
+                border: 1px solid #e2e8f0 !important;
+                box-shadow: none !important;
+                border-radius: 4px !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+            }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="text-slate-900 min-h-screen flex flex-col antialiased">
+
+    <!-- Navigation Header -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2.5 rounded-2xl shadow-lg shadow-indigo-100 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">TOR ANALYZER <span class="text-indigo-600">PRO</span></h1>
+                    <div class="flex items-center gap-1.5">
+                        <span class="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">AI-Powered Compliance Checker</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Switching Menu -->
+            <div class="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200 shadow-inner">
+                <button id="tab-btn-input" onclick="switchTab('input')" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-indigo-600 shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    กรอกข้อมูลนำเข้า
+                </button>
+                <button id="tab-btn-specs" onclick="switchTab('specs')" disabled class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-300 cursor-not-allowed">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+                    ข้อกำหนดที่วิเคราะห์ได้ (<span id="spec-count-badge">0</span>)
+                </button>
+                <button id="tab-btn-comparison" onclick="switchTab('comparison')" disabled class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-300 cursor-not-allowed">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                    ตารางเปรียบเทียบมาตรฐาน
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Workspace -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-8 print-full">
+        
+        <!-- Tab 1: Input Session -->
+        <div id="tab-view-input" class="animate-fade-in grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Left inputs (TOR and keywords) -->
+            <div class="lg:col-span-8 space-y-6">
+                <!-- TOR Textarea Card -->
+                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+                    <div class="p-5 bg-slate-50 border-b border-slate-100 flex justify-between items-center flex-wrap gap-2">
+                        <h3 class="font-bold text-slate-700 flex items-center gap-2 text-sm">
+                            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                            เนื้อหาเอกสาร TOR (Terms of Reference)
+                        </h3>
+                        <!-- Quick Templates Dropdown -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-slate-500 font-medium">โหลดตัวอย่าง:</span>
+                            <select id="template-selector" onchange="loadTemplate(this.value)" class="text-xs bg-white border border-slate-200 rounded-lg py-1 px-2.5 font-bold text-indigo-600 outline-none focus:ring-1 focus:ring-indigo-500">
+                                <option value="">-- กรุณาเลือก --</option>
+                                <option value="notebook-office">💻 คอมพิวเตอร์พกพา (งานสำนักงาน)</option>
+                                <option value="notebook-graphics">🎨 คอมพิวเตอร์ประสิทธิภาพสูง (งานกราฟิก)</option>
+                                <option value="server-storage">🖥️ เครื่องคอมพิวเตอร์แม่ข่าย (Server)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <textarea id="tor-text" rows="12" placeholder="กรุณาวางข้อความสเปกจากเอกสาร TOR ของคุณที่นี่ หรือคลิกปุ่มโหลดตัวอย่างสเปกเครื่องคอมพิวเตอร์ด้านบนเพื่อเริ่มต้น..." class="w-full p-6 text-slate-700 text-base border-none focus:ring-0 resize-none leading-relaxed placeholder:text-slate-300"></textarea>
+                </div>
+
+                <!-- Keywords/Brands -->
+                <div class="bg-indigo-50/55 rounded-[2rem] p-6 border border-indigo-100/70">
+                    <h3 class="font-bold text-indigo-950 mb-3 flex items-center gap-2 text-sm">
+                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        ยี่ห้อ หรือ รุ่นที่ต้องการเปรียบเทียบในท้องตลาดปัจจุบัน (ระบุได้มากกว่า 1)
+                    </h3>
+                    <input id="target-brands" type="text" placeholder="ตัวอย่างเช่น: MacBook Air M3, Dell Latitude 5440, HP ProBook 440 G10 (หากปล่อยว่าง ระบบจะหาเทียบรุ่นมาตรฐานให้)" class="w-full p-4 rounded-2xl border border-white bg-white/90 shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700 font-medium placeholder:text-slate-300 transition-all" />
+                </div>
+            </div>
+
+            <!-- Right operations -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- Notifications/Error Display -->
+                <div id="error-alert" class="hidden bg-rose-50 border border-rose-100 p-4 rounded-2xl flex gap-3 text-rose-600">
+                    <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    <div>
+                        <h4 class="font-bold text-xs uppercase tracking-wider">พบข้อผิดพลาด</h4>
+                        <p id="error-message" class="text-xs mt-0.5 font-medium"></p>
+                    </div>
+                </div>
+
+                <!-- Process Button -->
+                <button id="btn-start-analysis" onclick="handleProcess()" class="w-full py-6 rounded-[2.5rem] font-extrabold text-xl flex flex-col items-center justify-center gap-2 transition-all transform hover:scale-[1.01] active:scale-[0.99] bg-indigo-600 text-white shadow-xl shadow-indigo-100 hover:bg-indigo-700">
+                    <svg id="start-btn-icon-normal" class="w-10 h-10 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    <svg id="start-btn-icon-loading" class="hidden w-10 h-10 mb-1 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 4.19M20 3v5h-5" /></svg>
+                    <span id="start-btn-text" class="text-lg">เริ่มวิเคราะห์ข้อมูลด้วย AI</span>
+                    <span class="text-[10px] opacity-75 font-bold uppercase tracking-widest">Powered by Gemini 2.5 Flash</span>
+                </button>
+
+                <!-- Technical Details Card -->
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm space-y-4">
+                    <h4 class="font-extrabold text-slate-800 uppercase text-[10px] tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                        สถาปัตยกรรมและเทคโนโลยีที่ใช้
+                    </h4>
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <span class="text-xs font-bold text-slate-600">Gemini 2.5 Flash-Preview</span>
+                            </div>
+                            <span class="text-[9px] text-slate-400 font-bold uppercase">09-2025</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span>
+                                <span class="text-xs font-bold text-slate-600">Google Grounding Search</span>
+                            </div>
+                            <span class="text-[9px] text-indigo-500 font-extrabold uppercase">Live Check</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Step Log -->
+                    <div id="progress-box" class="hidden mt-4 p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100 flex flex-col items-center gap-3">
+                        <div class="flex gap-1.5">
+                            <span class="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+                            <span class="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+                            <span class="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+                        </div>
+                        <p id="progress-text" class="text-xs text-indigo-800 font-semibold text-center leading-relaxed">
+                            กำลังเตรียมเซสชันวิเคราะห์...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Specifications List & Editing -->
+        <div id="tab-view-specs" class="hidden animate-fade-in space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800 tracking-tight">หัวข้อและคุณสมบัติทางเทคนิคที่ตรวจพบ</h2>
+                    <p class="text-slate-500 text-sm font-medium">คุณสามารถปรับแต่งหรือลบเกณฑ์ที่ไม่จำเป็นออกได้เพื่อกำหนดสโคปให้ชัดเจนก่อนทำการตรวจสอบสินค้าจริง</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="addNewSpecification()" class="flex items-center gap-1.5 px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                        เพิ่มหัวข้อสเปก
+                    </button>
+                    <button onclick="switchTab('comparison')" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-100">
+                        ดูผลตารางเปรียบเทียบ
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Specs Grid -->
+            <div id="specs-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Will be dynamically populated via Javascript -->
+            </div>
+        </div>
+
+        <!-- Tab 3: Evaluation & Comparison Matrix -->
+        <div id="tab-view-comparison" class="hidden animate-fade-in space-y-8">
+            <!-- Header actions for results -->
+            <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden print-full card-flat">
+                <div class="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 no-print">
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800 tracking-tight">Technical Comparison Matrix</h2>
+                        <p class="text-slate-500 text-sm font-medium">การจับคู่และตรวจเช็กเกณฑ์คุณสมบัติตามมาตรฐานการจัดซื้อจัดจ้าง</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2.5">
+                        <button onclick="switchTab('input')" class="flex items-center gap-2 px-5 py-3 bg-white border border-slate-200 hover:bg-slate-50 rounded-2xl text-xs font-bold text-slate-600 shadow-sm transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 4.19M20 3v5h-5" /></svg>
+                            กรอกสเปกใหม่
+                        </button>
+                        <button onclick="window.print()" class="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs font-extrabold shadow-lg shadow-indigo-100 transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                            พิมพ์เอกสาร / บันทึก PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Printable Header only shown in print -->
+                <div class="hidden print:block p-8 border-b border-slate-200">
+                    <h1 class="text-2xl font-black text-slate-900 mb-1">รายงานการตรวจสอบเกณฑ์คุณสมบัติทางเทคนิค (TOR)</h1>
+                    <p class="text-slate-500 text-sm font-semibold">สร้างโดยระบบวิเคราะห์จัดซื้ออัตโนมัติ TOR Analyzer PRO</p>
+                </div>
+
+                <!-- Interactive Matrix Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse table-fixed min-w-[900px]">
+                        <thead>
+                            <tr class="bg-white border-b border-slate-100" id="matrix-header-row">
+                                <!-- Dynamically populated -->
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100" id="matrix-body">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Reference/Attribution Sources Section -->
+            <div id="sources-card" class="hidden bg-white rounded-[2rem] p-6 md:p-8 border border-slate-200 shadow-sm">
+                <h3 class="text-sm font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2.5 mb-5 no-print">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h2a2.5 2.5 0 002.5-2.5V14a2 2 0 012-2h.09M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    แหล่งอ้างอิงข้อมูลเว็บราคากลางและการจำหน่ายจริง (Google Search Grounding)
+                </h3>
+                <div id="sources-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-8 px-4 text-center mt-auto no-print">
+        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-[0.25em]">
+            TOR Analyzer PRO &copy; 2026 | พัฒนาขึ้นโดยใช้เทคโนโลยีวิเคราะห์สเปกเพื่อความแม่นยำในการจัดซื้อจัดจ้าง
+        </p>
+    </footer>
+
+    <!-- Custom Notification Toast Panel -->
+    <div id="toast-panel" class="hidden fixed bottom-6 right-6 bg-slate-950 text-white py-3 px-5 rounded-2xl shadow-xl flex items-center gap-3 z-50 max-w-sm animate-fade-in">
+        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+        <p id="toast-message" class="text-xs font-semibold"></p>
+    </div>
+
+    <!-- Application Controller logic (JS) -->
+    <script>
+        // System Config
+        const apiKey = ""; // Provided automatically in execution environment
+        
+        // Application State
+        let state = {
+            torText: '',
+            targetBrands: '',
+            isAnalyzing: false,
+            specifications: [], // { id, category, requirement, importance }
+            products: [],       // { productName, scores: [{ specId, meetsRequirement, details }], overallSummary }
+            activeTab: 'input',
+            error: null,
+            loadingStep: '',
+            groundingSources: [] // { title, uri }
+        };
+
+        // Standard TOR Templates Database
+        const templates = {
+            'notebook-office': `รายละเอียดคุณลักษณะเฉพาะเครื่องคอมพิวเตอร์พกพา (Notebook) สำหรับงานสำนักงานทั่วไป
+1. มีหน่วยประมวลผลกลาง (CPU) ไม่น้อยกว่า 4 แกนหลัก (4 Cores) และความเร็วสัญญาณนาฬิกาพื้นฐานไม่น้อยกว่า 1.8 GHz
+2. มีหน่วยความจำหลัก (RAM) ชนิด DDR4 หรือ DDR5 มีขนาดไม่น้อยกว่า 16 GB
+3. มีหน่วยจัดเก็บข้อมูลแบบ SSD (Solid State Drive) ความจุไม่น้อยกว่า 512 GB ชนิด PCIe/NVMe
+4. หน้าจอแสดงผลมีขนาดไม่น้อยกว่า 14 นิ้ว มีความละเอียดไม่น้อยกว่า Full HD (1920x1080)
+5. มีการรับประกันชิ้นส่วนและบริการ (On-site Service) จากผู้ผลิตไม่น้อยกว่า 3 ปี`,
+            
+            'notebook-graphics': `คุณลักษณะเฉพาะระบบคอมพิวเตอร์แบบพกพาสมรรถนะสูง สำหรับงานวิเคราะห์ภาพถ่ายและกราฟิก
+1. ใช้หน่วยประมวลผลกลางความเร็วสูง แบบ 8 Cores (Intel Core i7 หรือ AMD Ryzen 7 ขึ้นไป หรือสเปกที่ดีกว่า) รุ่นปี 2023 ขึ้นไป
+2. ติดตั้งหน่วยความจำระบบ (RAM) ขนาดไม่น้อยกว่า 32 GB
+3. มีชิปประมวลผลกราฟิกแยก (Dedicated GPU) พร้อมหน่วยความจำการ์ดจอไม่น้อยกว่า 6 GB
+4. มีหน่วยบันทึกข้อมูลหลักความเร็วสูงแบบ NVMe M.2 SSD ขนาดไม่น้อยกว่า 1 TB
+5. หน้าจอมีความเที่ยงตรงของสีสูง ขอบเขตสี sRGB 100% ขนาดไม่ต่ำกว่า 15.6 นิ้ว
+6. ตัวเครื่องมีน้ำหนักรวมแบตเตอรี่ไม่เกิน 2.2 กิโลกรัม`,
+
+            'server-storage': `คุณลักษณะเฉพาะเครื่องคอมพิวเตอร์แม่ข่าย (Server) สำหรับระบบบริการข้อมูลส่วนกลาง
+1. มีหน่วยประมวลผลกลาง (Processor) แบบไม่น้อยกว่า 8 Cores จำนวนไม่น้อยกว่า 1 หน่วย
+2. มีการประมวลผลข้อมูลในระดับความน่าเชื่อถือสูง รองรับการทำงานต่อเนื่อง (24/7)
+3. มีหน่วยความจำหลัก (RAM) ชนิด ECC (Error-Correcting Code) ขนาดไม่น้อยกว่า 64 GB
+4. รองรับการเชื่อมต่อหน่วยจัดเก็บข้อมูลแบบ Hot-Plug SAS หรือ SATA จำนวนไม่น้อยกว่า 8 ช่อง
+5. มีพอร์ตเชื่อมต่อเครือข่ายความเร็วสูง 10 Gbps LAN ไม่น้อยกว่า 2 พอร์ต
+6. รองรับการติดตั้งอุปกรณ์สำรองพลังงานไฟคู่ (Dual Redundant Power Supply)`
+        };
+
+        // Initialize App on DOM Content Loaded
+        window.onload = function() {
+            // Restore potential inputs from localStorage or state
+            document.getElementById('tor-text').value = state.torText;
+            document.getElementById('target-brands').value = state.targetBrands;
+        };
+
+        // Render Application to match current state
+        function render() {
+            // Control views toggle
+            const tabs = ['input', 'specs', 'comparison'];
+            tabs.forEach(tab => {
+                const el = document.getElementById(`tab-view-${tab}`);
+                const btn = document.getElementById(`tab-btn-${tab}`);
+                
+                if (state.activeTab === tab) {
+                    el.classList.remove('hidden');
+                    btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all bg-white text-indigo-600 shadow-sm border border-slate-200/50";
+                } else {
+                    el.classList.add('hidden');
+                    // Check if disabled
+                    const isDisabled = (tab === 'specs' && state.specifications.length === 0) || 
+                                     (tab === 'comparison' && state.products.length === 0);
+                    
+                    if (isDisabled) {
+                        btn.setAttribute('disabled', 'true');
+                        btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-300 cursor-not-allowed";
+                    } else {
+                        btn.removeAttribute('disabled');
+                        btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-indigo-500 hover:bg-white/50";
+                    }
+                }
+            });
+
+            // Update badge counts
+            document.getElementById('spec-count-badge').textContent = state.specifications.length;
+
+            // Render Error Messages
+            const errorAlert = document.getElementById('error-alert');
+            const errorMessage = document.getElementById('error-message');
+            if (state.error) {
+                errorAlert.classList.remove('hidden');
+                errorMessage.textContent = state.error;
+            } else {
+                errorAlert.classList.add('hidden');
+            }
+
+            // Update Loading / Processing UI
+            const startBtnIconNormal = document.getElementById('start-btn-icon-normal');
+            const startBtnIconLoading = document.getElementById('start-btn-icon-loading');
+            const startBtnText = document.getElementById('start-btn-text');
+            const btnStart = document.getElementById('btn-start-analysis');
+            const progressBox = document.getElementById('progress-box');
+            const progressText = document.getElementById('progress-text');
+
+            if (state.isAnalyzing) {
+                startBtnIconNormal.classList.add('hidden');
+                startBtnIconLoading.classList.remove('hidden');
+                startBtnText.textContent = 'กำลังประมวลผลข้อมูล...';
+                btnStart.setAttribute('disabled', 'true');
+                btnStart.classList.replace('bg-indigo-600', 'bg-indigo-400');
+                btnStart.classList.add('cursor-not-allowed');
+                progressBox.classList.remove('hidden');
+                progressText.textContent = state.loadingStep;
+            } else {
+                startBtnIconNormal.classList.remove('hidden');
+                startBtnIconLoading.classList.add('hidden');
+                startBtnText.textContent = 'เริ่มวิเคราะห์ข้อมูลด้วย AI';
+                btnStart.removeAttribute('disabled');
+                btnStart.classList.replace('bg-indigo-400', 'bg-indigo-600');
+                btnStart.classList.remove('cursor-not-allowed');
+                progressBox.classList.add('hidden');
+            }
+
+            // Populate Specs List (Tab 2)
+            renderSpecsList();
+
+            // Populate Comparison Matrix (Tab 3)
+            renderComparisonMatrix();
+
+            // Populate Web Grounding Sources
+            renderGroundingSources();
+        }
+
+        // State controller helper
+        function setState(updates) {
+            state = { ...state, ...updates };
+            render();
+        }
+
+        // Switch to selected Tab
+        function switchTab(tabId) {
+            // Prevent entering empty views
+            if (tabId === 'specs' && state.specifications.length === 0) return;
+            if (tabId === 'comparison' && state.products.length === 0) return;
+            
+            setState({ activeTab: tabId });
+        }
+
+        // Load TOR Template
+        function loadTemplate(key) {
+            if (!key) return;
+            const templateText = templates[key];
+            if (templateText) {
+                document.getElementById('tor-text').value = templateText;
+                state.torText = templateText;
+                showToast(`โหลดตัวอย่าง "${document.getElementById('template-selector').options[document.getElementById('template-selector').selectedIndex].text}" เรียบร้อยแล้ว`);
+            }
+        }
+
+        // Trigger dynamic system audit process
+        async function handleProcess() {
+            const textValue = document.getElementById('tor-text').value.trim();
+            const brandsValue = document.getElementById('target-brands').value.trim();
+
+            if (!textValue) {
+                setState({ error: 'โปรดกรอกรายละเอียดข้อมูล TOR ก่อนดำเนินต่อ' });
+                return;
+            }
+
+            // Update inputs to local state
+            state.torText = textValue;
+            state.targetBrands = brandsValue;
+
+            setState({
+                isAnalyzing: true,
+                error: null,
+                loadingStep: 'กำลังทำความเข้าใจเกณฑ์ TOR ภาษาไทยของคุณ...'
+            });
+
+            try {
+                // Setup specific audit user query
+                const userQuery = `วิเคราะห์รายละเอียดคุณลักษณะเฉพาะ (TOR) ต่อไปนี้อย่างละเอียด และแยกสเปกออกเป็นข้อๆ: 
+"${state.torText}"
+
+รวมถึงเปรียบเทียบข้อมูลจำเพาะเชิงเทคนิค ความคุ้มค่า และการปฏิบัติตามกฎเกณฑ์ กับสินค้าจริงและยี่ห้อดังต่อไปนี้: "${state.targetBrands || 'สินค้าเป้าหมายสเปกยอดนิยมในตลาดปัจจุบัน'}"
+โดยทำการตรวจเช็กกับราคากลางและสเปกสินค้าอัปเดตในตลาดไทยปี 2024-2025`;
+
+                // Run audit execution phase
+                const result = await runComplianceAuditor(userQuery);
+
+                if (!result.specs || !result.productComparison) {
+                    throw new Error("โครงสร้างผลลัพธ์จาก AI ขาดหายหรือไม่สอดคล้องกับพารามิเตอร์ที่กำหนด");
+                }
+
+                setState({
+                    specifications: result.specs,
+                    products: result.productComparison,
+                    isAnalyzing: false,
+                    activeTab: 'specs'
+                });
+                
+                showToast("วิเคราะห์สเปกเสร็จสมบูรณ์เรียบร้อยแล้ว!");
+            } catch (err) {
+                setState({
+                    error: `ระบบการวิเคราะห์ขัดข้องชั่วคราว: ${err.message}`,
+                    isAnalyzing: false
+                });
+            }
+        }
+
+        // Master fetch system utilizing standard retry with exponential backoff
+        async function runComplianceAuditor(userPrompt) {
+            const systemPrompt = `คุณคือ "Expert Procurement Auditor" ผู้เชี่ยวชาญระดับสูงด้านการวิเคราะห์ TOR และสืบราคากลางของประเทศไทย
+ภารกิจที่ต้องดำเนินการ:
+1. วิเคราะห์ข้อกำหนด TOR ภาษาไทย: สกัดเกณฑ์สเปกสำคัญ (Requirements) ออกมาเป็นข้อๆ ระบุ id (เช่น spec-1, spec-2), หมวดหมู่ไทย (category เช่น ซีพียู, แรม, หน้าจอ, การรับประกัน) และระดับความสำคัญ (importance เช่น High, Medium, Low)
+2. ค้นหาสินค้าและราคากลางจริง: ตรวจสอบข้อมูลผู้จำหน่ายจริงผ่าน Google Search ในประเทศไทย โดยระบุชื่อรุ่นที่สอดคล้องหรือรุ่นที่เจาะจงมา
+3. ตรวจสอบความถูกต้องตามขอบเขตข้อกำหนดอย่างเคร่งครัด (Compliance checking):
+   - เปรียบเทียบสินค้าคู่เทียบจริงที่วางจำหน่ายในไทยว่า meetsRequirement (true หรือ false) หรือไม่ และให้ระบุเหตุผลและคำอธิบายเป็นภาษาไทย
+4. สรุปภาพรวมเชิงยุทธวิธี (overallSummary): เขียนจุดเด่น จุดเสี่ยง หรือข้อคิดเห็นเกี่ยวกับสิทธิ์การจัดซื้อของแต่ละผู้สมัคร
+
+ตอบกลับข้อมูลเป็นรูปแบบ JSON ตาม Schema ที่กําหนดไว้เท่านั้น ห้ามใส่เครื่องหมายพิเศษหรือตัวอักษรภายนอกบล็อก JSON`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                tools: [{ "google_search": {} }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            specs: {
+                                type: "ARRAY",
+                                items: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        id: { type: "STRING" },
+                                        category: { type: "STRING" },
+                                        requirement: { type: "STRING" },
+                                        importance: { type: "STRING" }
+                                    },
+                                    required: ["id", "category", "requirement", "importance"]
+                                }
+                            },
+                            productComparison: {
+                                type: "ARRAY",
+                                items: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        productName: { type: "STRING" },
+                                        scores: {
+                                            type: "ARRAY",
+                                            items: {
+                                                type: "OBJECT",
+                                                properties: {
+                                                    specId: { type: "STRING" },
+                                                    meetsRequirement: { type: "BOOLEAN" },
+                                                    details: { type: "STRING" }
+                                                },
+                                                required: ["specId", "meetsRequirement", "details"]
+                                            }
+                                        },
+                                        overallSummary: { type: "STRING" }
+                                    },
+                                    required: ["productName", "scores", "overallSummary"]
+                                }
+                            }
+                        },
+                        required: ["specs", "productComparison"]
+                    }
+                }
+            };
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            let retries = 0;
+            const maxRetries = 5;
+            
+            while (retries <= maxRetries) {
+                try {
+                    // Simulating step status updating
+                    updateProcessingStatus(retries);
+
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API Error Status: ${response.status}`);
+                    }
+
+                    const rawData = await response.json();
+                    
+                    // Extract Grounding Citations
+                    const attributions = rawData.candidates?.[0]?.groundingMetadata?.groundingAttributions || [];
+                    const extractedSources = attributions.map(item => ({
+                        title: item.web?.title || 'แหล่งข้อมูลอ้างอิงราคากลาง',
+                        uri: item.web?.uri
+                    })).filter(source => source.uri);
+
+                    state.groundingSources = extractedSources;
+
+                    const generatedText = rawData.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!generatedText) {
+                        throw new Error("ไม่มีผลลัพธ์ข้อความถูกส่งกลับมาจากโมเดลประมวลผล");
+                    }
+
+                    return JSON.parse(generatedText);
+                } catch (err) {
+                    if (retries === maxRetries) {
+                        throw err;
+                    }
+                    const sleepDuration = Math.pow(2, retries) * 1000;
+                    await new Promise(resolve => setTimeout(resolve, sleepDuration));
+                    retries++;
+                }
+            }
+        }
+
+        // Update active loading text during retries and execution
+        function updateProcessingStatus(retryCount) {
+            const steps = [
+                'กำลังเชื่อมต่อกับ AI Auditor และเปิดระบบสืบราคากลางบนเว็บ...',
+                'กำลังประมวลภาษาไทยและระบุมาตรฐานเกณฑ์ขั้นต่ำ...',
+                'กำลังเทียบสินค้าในท้องตลาดปี 2024-2025 จากแหล่งข่าวจำหน่ายในประเทศไทย...',
+                'กำลังจัดรูปรายงานสรุปความสอดคล้องตามเกณฑ์...',
+                'กำลังทำความสะอาดและตรวจสอบความเสถียรของตาราง JSON...'
+            ];
+            const currentStep = retryCount < steps.length ? steps[retryCount] : 'กำลังพยายามจัดส่งผลลัพธ์ใหม่อีกครั้ง...';
+            setState({ loadingStep: currentStep });
+        }
+
+        // Render Specs List with editable properties
+        function renderSpecsList() {
+            const container = document.getElementById('specs-grid-container');
+            container.innerHTML = '';
+
+            if (state.specifications.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-16 text-center text-slate-400 font-bold">
+                        ไม่พบข้อกำหนดที่บันทึก โปรดวิเคราะห์สเปกหรือเพิ่มข้อมูลนำเข้าก่อน
+                    </div>
+                `;
+                return;
+            }
+
+            state.specifications.forEach(spec => {
+                const priorityClass = spec.importance === 'High' ? 'bg-rose-50 text-rose-600' : 'bg-slate-50 text-slate-500';
+                const card = document.createElement('div');
+                card.className = "bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:border-indigo-300 transition-all relative overflow-hidden flex flex-col justify-between";
+                card.innerHTML = `
+                    <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500 opacity-20"></div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-start gap-2">
+                            <span class="text-[10px] font-black text-indigo-600 uppercase tracking-wider bg-indigo-50 px-2.5 py-1 rounded-lg">${spec.category}</span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full ${priorityClass}">${spec.importance}</span>
+                                <button onclick="deleteSpec('${spec.id}')" class="text-slate-300 hover:text-rose-500 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 tracking-wide uppercase">เกณฑ์ความต้องการทางเทคนิค</label>
+                            <textarea onchange="updateSpecRequirement('${spec.id}', this.value)" class="w-full text-sm text-slate-700 font-bold bg-transparent border-none hover:bg-slate-50 focus:bg-slate-50 focus:ring-1 focus:ring-indigo-300 rounded-xl p-2 leading-relaxed resize-none transition-all" rows="4">${spec.requirement}</textarea>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-50 flex justify-between items-center text-[10px] font-bold text-slate-400">
+                        <span>ID: ${spec.id}</span>
+                        <span class="text-indigo-400 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                            แก้ไขได้ทันที
+                        </span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Inline edit dynamic handlers
+        function updateSpecRequirement(id, text) {
+            const updated = state.specifications.map(spec => {
+                if (spec.id === id) {
+                    return { ...spec, requirement: text };
+                }
+                return spec;
+            });
+            setState({ specifications: updated });
+            showToast("อัปเดตข้อกำหนดเรียบร้อยแล้ว");
+        }
+
+        function deleteSpec(id) {
+            const filtered = state.specifications.filter(spec => spec.id !== id);
+            setState({ specifications: filtered });
+            showToast("ลบข้อกำหนดที่เลือกแล้ว");
+        }
+
+        function addNewSpecification() {
+            const newId = `custom-spec-${Date.now()}`;
+            const newSpec = {
+                id: newId,
+                category: 'หมวดหมู่อื่นๆ',
+                requirement: 'พิมพ์ข้อมูลความต้องการที่ต้องการเพิ่มเติมที่นี่...',
+                importance: 'Medium'
+            };
+            setState({ specifications: [...state.specifications, newSpec] });
+            showToast("เพิ่มเกณฑ์มาตรฐานใหม่เรียบร้อยแล้ว");
+        }
+
+        // Render comparison view grid and pass evaluation
+        function renderComparisonMatrix() {
+            const headerRow = document.getElementById('matrix-header-row');
+            const body = document.getElementById('matrix-body');
+
+            headerRow.innerHTML = '';
+            body.innerHTML = '';
+
+            if (state.products.length === 0) return;
+
+            // 1. Create table headers
+            const headerCellMain = document.createElement('th');
+            headerCellMain.className = "p-6 md:p-8 text-slate-400 font-extrabold uppercase text-[10px] tracking-[0.15em] w-[40%] text-left";
+            headerCellMain.textContent = "เกณฑ์ข้อกำหนดทางเทคนิค (TOR)";
+            headerRow.appendChild(headerCellMain);
+
+            state.products.forEach((prod, index) => {
+                const headCell = document.createElement('th');
+                headCell.className = "p-6 md:p-8 text-center border-l border-slate-100 w-[30%]";
+                headCell.innerHTML = `
+                    <div class="bg-indigo-50 inline-block px-3 py-1 rounded-full text-[9px] text-indigo-600 font-black mb-2 uppercase tracking-wider">Candidate ${index + 1}</div>
+                    <div class="text-slate-800 font-extrabold text-base leading-tight uppercase tracking-tight">${prod.productName}</div>
+                `;
+                headerRow.appendChild(headCell);
+            });
+
+            // 2. Loop on specifications to construct table rows
+            state.specifications.forEach((spec, specIdx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/50 transition-colors border-b border-slate-100";
+
+                // Standard Column (Requirement Details)
+                const tdReq = document.createElement('td');
+                tdReq.className = "p-6 md:p-8 align-top";
+                tdReq.innerHTML = `
+                    <div class="flex items-start gap-4">
+                        <div class="w-7 h-7 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 font-extrabold text-xs flex-shrink-0 mt-0.5">
+                            ${specIdx + 1}
+                        </div>
+                        <div>
+                            <div class="text-[9px] text-indigo-500 font-extrabold mb-1.5 uppercase tracking-wide">${spec.category}</div>
+                            <div class="text-slate-800 font-semibold text-sm leading-relaxed">${spec.requirement}</div>
+                        </div>
+                    </div>
+                `;
+                tr.appendChild(tdReq);
+
+                // Populate matched compliance results
+                state.products.forEach(product => {
+                    const matchedScore = product.scores?.find(s => s.specId === spec.id);
+                    const isPassed = matchedScore ? matchedScore.meetsRequirement : false;
+                    const explanationText = matchedScore ? matchedScore.details : 'ไม่มีข้อมูลการตรวจเช็คในระบบ';
+
+                    const tdScore = document.createElement('td');
+                    tdScore.className = "p-6 md:p-8 text-center border-l border-slate-100 align-top";
+
+                    const badgeStyle = isPassed 
+                        ? 'bg-emerald-500 text-white' 
+                        : 'bg-rose-500 text-white';
+
+                    const badgeIcon = isPassed
+                        ? `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`
+                        : `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>`;
+
+                    const descBoxStyle = isPassed
+                        ? 'bg-emerald-50/50 text-emerald-800 border border-emerald-100'
+                        : 'bg-rose-50/50 text-rose-800 border border-rose-100';
+
+                    tdScore.innerHTML = `
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="p-1.5 rounded-full ${badgeStyle} shadow-sm">
+                                ${badgeIcon}
+                            </div>
+                            <p class="text-xs font-semibold p-3 rounded-2xl max-w-[240px] text-left leading-relaxed ${descBoxStyle}">
+                                ${explanationText}
+                            </p>
+                        </div>
+                    `;
+                    tr.appendChild(tdScore);
+                });
+
+                body.appendChild(tr);
+            });
+
+            // 3. Final Overall AI Summary Strategic row
+            const trSummary = document.createElement('tr');
+            trSummary.className = "bg-slate-900 text-white print:bg-slate-100 print:text-black";
+
+            const tdSummaryTitle = document.createElement('td');
+            tdSummaryTitle.className = "p-6 md:p-8 align-top";
+            tdSummaryTitle.innerHTML = `
+                <div class="flex items-center gap-2 mb-2">
+                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.373-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+                    <h4 class="font-extrabold text-sm uppercase tracking-wider">AI Procurement Audit Note</h4>
+                </div>
+                <p class="text-[10px] text-slate-400 font-bold leading-relaxed">บทวิจารณ์และประเมินภาพรวมความเสี่ยงโดย AI</p>
+            `;
+            trSummary.appendChild(tdSummaryTitle);
+
+            state.products.forEach(product => {
+                const tdSummaryDesc = document.createElement('td');
+                tdSummaryDesc.className = "p-6 md:p-8 border-l border-slate-800 align-top";
+                tdSummaryDesc.innerHTML = `
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-5 print:border-slate-300 print:bg-white">
+                        <p class="text-slate-300 text-xs font-semibold leading-relaxed italic print:text-slate-800">
+                            "${product.overallSummary || 'ผ่านคุณลักษณะขั้นต่ำส่วนใหญ่ เหมาะสำหรับการเสนอราคาอย่างเป็นทางการ'}"
+                        </p>
+                    </div>
+                `;
+                trSummary.appendChild(tdSummaryDesc);
+            });
+
+            body.appendChild(trSummary);
+        }
+
+        // Render reference websites links
+        function renderGroundingSources() {
+            const card = document.getElementById('sources-card');
+            const container = document.getElementById('sources-list-container');
+            container.innerHTML = '';
+
+            if (state.groundingSources.length === 0) {
+                card.classList.add('hidden');
+                return;
+            }
+
+            card.classList.remove('hidden');
+            
+            state.groundingSources.forEach((source, index) => {
+                const domain = new URL(source.uri).hostname;
+                const item = document.createElement('a');
+                item.href = source.uri;
+                item.target = '_blank';
+                item.rel = 'noopener noreferrer';
+                item.className = "flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-all group shadow-sm";
+                item.innerHTML = `
+                    <div class="flex flex-col gap-1 overflow-hidden">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider truncate">${domain}</span>
+                        <span class="text-xs font-bold text-slate-700 truncate group-hover:text-indigo-600 transition-colors">${source.title || 'ข้อมูลผลิตภัณฑ์สืบค้นจริง'}</span>
+                    </div>
+                    <svg class="w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Action Toast Panel message
+        function showToast(message) {
+            const panel = document.getElementById('toast-panel');
+            const text = document.getElementById('toast-message');
+            
+            text.textContent = message;
+            panel.classList.remove('hidden');
+            
+            setTimeout(() => {
+                panel.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
